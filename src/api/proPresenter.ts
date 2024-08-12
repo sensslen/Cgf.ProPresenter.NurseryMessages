@@ -1,24 +1,24 @@
-// src/api/proPresenter.ts
-
 import axios from 'axios';
 import { Message, TriggerPayload } from '../types/proPresenter';
 
 export const getMessages = async (url: string): Promise<Message[]> => {
+    const resource = `${url}/v1/messages`;
     try {
-        const response = await axios.get<Message[]>(`${url}/v1/messages`);
+        const response = await axios.get<Message[]>(resource);
         return response.data;
     } catch (error) {
         handleApiError(error);
-        throw new Error('Failed to fetch messages');
+        throw new Error(`Failed to fetch messages from ${resource}`);
     }
 };
 
 export const triggerMessage = async (url: string, id: string, payload: TriggerPayload): Promise<void> => {
+    const resource = `${url}/v1/message/${id}/trigger`;
     try {
-        await axios.post(`${url}/v1/message/${id}/trigger`, payload);
+        await axios.post(resource, payload);
     } catch (error) {
         handleApiError(error);
-        throw new Error('Failed to trigger message');
+        throw new Error(`Failed to trigger message at ${resource} with payload: ${JSON.stringify(payload)}`);
     }
 };
 
