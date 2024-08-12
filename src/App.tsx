@@ -1,9 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MessageList from './components/MessageList';
 
 const App: React.FC = () => {
   const [url, setUrl] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+
+  const handleUrlChange = (newUrl: string) => {
+    setUrl(newUrl);
+    // Update the URL in the address bar without reloading
+    window.history.pushState(null, '', `?url=${encodeURIComponent(newUrl)}`);
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const initialUrl = params.get('url');
+    if (initialUrl) {
+      setUrl(decodeURIComponent(initialUrl));
+    }
+  }, []);
 
   return (
     <div className="p-4">
@@ -16,7 +30,7 @@ const App: React.FC = () => {
         <input
           type="text"
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => handleUrlChange(e.target.value)}
           className="border p-2 w-full"
           placeholder="Enter ProPresenter URL/IP"
         />
