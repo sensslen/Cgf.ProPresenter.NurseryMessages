@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Message, Token } from '../types/proPresenter';
+import { Message } from '../types/proPresenter';
 import TokenInput from './TokenInput';
 
 interface MessageItemProps {
@@ -19,19 +19,11 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage }) => 
         return initialTokenValues;
     });
 
-    const renderMessageWithTokens = (message: string, tokens: Token[]): string => {
-        let matchIndex = 0;
-        return message.replace(/\$\{(.*?)\}/g, () => {
-            if (tokens.length <= matchIndex) {
-                return '';
-            }
-            const value = tokenValues[tokens[matchIndex]?.name];
-            matchIndex++;
-            if (value === undefined) {
-                return '';
-            }
-            return value;
+    const renderMessageWithTokens = (message: string): string => {
+        Object.entries(tokenValues).forEach(([name, value]) => {
+            message = message.replace(`{${name}}`, value);
         });
+        return message;
     };
 
     return (
@@ -50,7 +42,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage }) => 
             <div className="mt-4 flex items-center gap-2">
                 <p className="text-sm font-medium text-gray-600">Formatted Message:</p>
                 <p className="text-sm text-gray-700">
-                    {renderMessageWithTokens(message.message, message.tokens)}
+                    {renderMessageWithTokens(message.message)}
                 </p>
             </div>
             <button
