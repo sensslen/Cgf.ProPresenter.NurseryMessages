@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Message } from '../types/proPresenter';
 import TokenInput from './TokenInput';
+import { Trans, useTranslation } from 'react-i18next';
 
 interface MessageItemProps {
     message: Message;
@@ -8,6 +9,7 @@ interface MessageItemProps {
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage }) => {
+    const { t } = useTranslation();
     const [tokenValues, setTokenValues] = useState<{ [key: string]: string }>(() => {
         // Initialize token values based on message tokens
         const initialTokenValues: { [key: string]: string } = {};
@@ -40,18 +42,15 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage }) => 
                 ))}
             </div>
             <div className="mt-4 flex items-center gap-2">
-                <p className="text-sm font-medium text-gray-600">Formatted Message:</p>
-                <p className="text-sm text-gray-700">
-                    {renderMessageWithTokens(message.message)}
-                </p>
-            </div>
+                <Trans i18nKey="message-item.formatted-message" t={t} components={{ description_format: <p className="text-sm font-medium text-gray-400" />, message_format: <p className="text-sm text-gray-700" /> }} values={{ message: renderMessageWithTokens(message.message) }} />
+            </div >
             <button
                 onClick={() => onShowMessage(message, tokenValues)}
                 className="bg-green-500 text-white p-2 mt-2"
             >
-                Show
+                {t('message-item.show')}
             </button>
-        </li>
+        </li >
     );
 };
 

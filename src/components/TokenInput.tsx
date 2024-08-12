@@ -14,6 +14,7 @@ const TokenInput: React.FC<TokenInputProps> = ({ token, tokenValue, setTokenValu
             <input
                 type="text"
                 value={tokenValue}
+                placeholder={token.name}
                 onChange={(e) => setTokenValue(e.target.value)}
                 className="border p-2 w-full"
             />

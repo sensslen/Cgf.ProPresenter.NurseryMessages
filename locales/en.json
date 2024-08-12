@@ -1,0 +1,17 @@
+{
+    "app": {
+        "loading": "Loading...",
+        "enterProPresenterUrl": "Enter connetion to ProPresenter"
+    },
+    "message-list": {
+        "errors": {
+            "failed-to-connect": "Failed to connect to ProPresenter. Please check the connection and try again.",
+            "unknown-error": "An unexpected error occurred: {{error}}.",
+            "failed-to-show": "Failed to show message. Please try again."
+        }
+    },
+    "message-item": {
+        "formatted-message": "<description_format>Formatted message:</description_format> <message_format>{{message}}</message_format>",
+        "show": "Show"
+    }
+}

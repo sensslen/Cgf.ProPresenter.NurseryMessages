@@ -1,0 +1,17 @@
+{
+    "app": {
+        "loading": "Lade...",
+        "enterProPresenterUrl": "Verbindung zu ProPresenter eingeben"
+    },
+    "message-list": {
+        "errors": {
+            "failed-to-connect": "Verbindung zu ProPresenter fehlgeschlagen. Bitte überprüfen Sie die Verbindung und versuchen Sie es erneut.",
+            "unknown-error": "Ein unerwarteter Fehler ist aufgetreten: {{error}}.",
+            "failed-to-show": "Nachricht konnte nicht angezeigt werden. Bitte versuchen Sie es erneut."
+        }
+    },
+    "message-item": {
+        "formatted-message": "<description_format>Formatierte Nachricht:</description_format> <message_format>{{message}}</message_format>",
+        "show": "Anzeigen"
+    }
+}

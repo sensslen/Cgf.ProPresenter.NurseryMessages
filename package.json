@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "homepage": "https://sensslen.github.io/Cgf.ProPresenter.NurseryMessages",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
@@ -14,8 +13,11 @@
   },
   "dependencies": {
     "axios": "^1.7.3",
+    "i18next": "^23.12.2",
+    "i18next-browser-languagedetector": "^8.0.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-i18next": "^15.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",
@@ -26,7 +28,6 @@
     "eslint": "^9.8.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
-    "gh-pages": "^6.1.1",
     "globals": "^15.9.0",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.9",

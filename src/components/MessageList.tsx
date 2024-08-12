@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { getMessages, triggerMessage } from '../api/proPresenter';
 import { Message, TriggerPayloadToken } from '../types/proPresenter';
 import MessageItem from './MessageItem';
+import { useTranslation } from 'react-i18next';
 
 interface MessageListProps {
     url: string;
@@ -10,6 +11,7 @@ interface MessageListProps {
 
 const MessageList: React.FC<MessageListProps> = ({ url, setError }) => {
     const [messages, setMessages] = useState<Message[]>([]);
+    const { t } = useTranslation();
 
     // Fetch messages from the server
     const fetchMessages = useCallback(async () => {
@@ -21,14 +23,14 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError }) => {
             setError(null); // Clear previous errors
         } catch (error) {
             if (error instanceof Error) {
-                setError('Failed to connect to ProPresenter. Please check the URL and try again.');
+                setError(t('message-list.errors.failed-to-connect'));
                 console.error('Error fetching messages:', error.message);
             } else {
-                setError('An unexpected error occurred.');
+                setError(t("message-list.errors.unknown-error", { error }));
                 console.error('Unexpected error:', error);
             }
         }
-    }, [url, setError]);
+    }, [url, setError, t]);
 
     // Fetch messages periodically
     useEffect(() => {
@@ -74,10 +76,10 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError }) => {
             fetchMessages(); // Refresh messages after showing
         } catch (error) {
             if (error instanceof Error) {
-                setError('Failed to show message. Please try again.');
+                setError(t('message-list.errors.failed-to-show'));
                 console.error('Error triggering message:', error.message);
             } else {
-                setError('An unexpected error occurred.');
+                setError(t("message-list.errors.unknown-error", { error }));
                 console.error('Unexpected error:', error);
             }
         }
