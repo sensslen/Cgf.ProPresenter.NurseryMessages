@@ -1,7 +1,21 @@
 import axios from 'axios';
 import { Message, TriggerPayload } from '../types/proPresenter';
 
+  const isValidUrl = (inputUrl: string): boolean => {
+    try {
+      // Use URL constructor for basic format validation
+      new URL(inputUrl);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
 export const getMessages = async (url: string): Promise<Message[]> => {
+    if (!isValidUrl(url)) {
+        throw new Error('Invalid URL format');
+    }
+
     const resource = `${url}/v1/messages`;
     try {
         const response = await axios.get<Message[]>(resource);

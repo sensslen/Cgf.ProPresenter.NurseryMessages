@@ -5,7 +5,7 @@
     },
     "message-list": {
         "errors": {
-            "failed-to-connect": "Verbindung zu ProPresenter fehlgeschlagen. Bitte überprüfen Sie die Verbindung und versuchen Sie es erneut.",
+            "failed-to-connect": "Verbindung zu ProPresenter fehlgeschlagen. Bitte überprüfen Sie die Verbindungsinformation.",
             "unknown-error": "Ein unerwarteter Fehler ist aufgetreten: {{error}}.",
             "failed-to-show": "Nachricht konnte nicht angezeigt werden. Bitte versuchen Sie es erneut."
         }

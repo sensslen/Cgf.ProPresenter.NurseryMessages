@@ -1,11 +1,11 @@
 {
     "app": {
         "loading": "Loading...",
-        "enterProPresenterUrl": "Enter connetion to ProPresenter"
+        "enterProPresenterUrl": "Enter connection to ProPresenter"
     },
     "message-list": {
         "errors": {
-            "failed-to-connect": "Failed to connect to ProPresenter. Please check the connection and try again.",
+            "failed-to-connect": "Failed to connect to ProPresenter. Please check the connection information.",
             "unknown-error": "An unexpected error occurred: {{error}}.",
             "failed-to-show": "Failed to show message. Please try again."
         }

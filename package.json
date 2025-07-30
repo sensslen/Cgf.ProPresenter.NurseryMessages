@@ -12,7 +12,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/postcss": "^4.1.11",
     "axios": "^1.7.3",
     "i18next": "^24",
     "i18next-browser-languagedetector": "^8.0.0",
@@ -21,6 +20,8 @@
     "react-i18next": "^15.0.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@tailwindcss/vite": "^4.1.11",
     "@eslint/js": "^9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
