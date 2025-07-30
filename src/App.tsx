@@ -23,6 +23,7 @@ i18n.use(initReactI18next).init({
 const App: React.FC = () => {
   const [url, setUrl] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const { t } = useTranslation();
 
   const handleUrlChange = (newUrl: string) => {
@@ -44,12 +45,26 @@ const App: React.FC = () => {
     i18n.changeLanguage(lng);
   }, []);
 
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(null);
+      }, 3000); // Clear the success message after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
   return (
     <Suspense fallback={t("app.loading")}>
       <div className="p-4">
         {error && (
           <div className="bg-red-500 text-white p-2 mb-4">
             {error}
+          </div>
+        )}
+        {success && (
+          <div className="bg-green-500 text-white p-2 mb-4">
+            {success}
           </div>
         )}
         <div className="mb-4">
@@ -65,6 +80,7 @@ const App: React.FC = () => {
           <MessageList
             url={url}
             setError={setError}
+            setSuccess={setSuccess}
           />
         )}
       </div>

@@ -7,9 +7,10 @@ import { useTranslation } from 'react-i18next';
 interface MessageListProps {
     url: string;
     setError: React.Dispatch<React.SetStateAction<string | null>>;
+    setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ url, setError }) => {
+const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const { t } = useTranslation();
 
@@ -41,6 +42,13 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError }) => {
         // Cleanup interval on component unmount
         return () => clearInterval(intervalId);
     }, [fetchMessages]);
+    
+    const renderMessageWithTokens = (message: string, tokenValues: { [key: string]: string }): string => {
+        Object.entries(tokenValues).forEach(([name, value]) => {
+            message = message.replace(`{${name}}`, value);
+        });
+        return message;
+    };
 
     const handleShowMessage = async (message: Message, tokenValues: { [key: string]: string }) => {
         if (!url) return;
@@ -73,6 +81,8 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError }) => {
         try {
             await triggerMessage(url, message.id.uuid, payload);
             setError(null); // Clear previous errors
+            const formattedMessage = renderMessageWithTokens(message.message, tokenValues);
+            setSuccess(t('message-list.success.message-shown-with-details', { message: formattedMessage })); // Set the success message
             fetchMessages(); // Refresh messages after showing
         } catch (error) {
             if (error instanceof Error) {
