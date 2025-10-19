@@ -21,12 +21,15 @@ i18n.use(initReactI18next).init({
   }
 });
 
+// Constants for URL parameter names to ensure type safety
+const URL_PARAM_KEY = 'url' as const;
+
 const App: React.FC = () => {
   // Initialize URL from query parameter at component creation
   // Using lazy initialization to avoid calling getInitialUrl on every render
   const [url, setUrl] = useState<string>(() => {
     const params = new URLSearchParams(window.location.search);
-    const urlParam = params.get('url');
+    const urlParam = params.get(URL_PARAM_KEY);
     if (urlParam) {
       try {
         // Try to decode as Base64 first (new format)
@@ -53,7 +56,7 @@ const App: React.FC = () => {
     // Encode the URL in Base64 for better security and readability
     if (newUrl) {
       const encodedUrl = encodeUrlToBase64(newUrl);
-      window.history.pushState(null, '', `?url=${encodedUrl}`);
+      window.history.pushState(null, '', `?${URL_PARAM_KEY}=${encodedUrl}`);
     } else {
       window.history.pushState(null, '', window.location.pathname);
     }
