@@ -1,1 +1,0 @@
-{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/api/proPresenter.ts","./src/components/MessageItem.tsx","./src/components/MessageList.tsx","./src/components/TokenInput.tsx","./src/types/proPresenter.ts"],"version":"5.9.3"}
