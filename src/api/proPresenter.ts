@@ -6,7 +6,7 @@ import { Message, TriggerPayload } from '../types/proPresenter';
       // Use URL constructor for basic format validation
       new URL(inputUrl);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   };
