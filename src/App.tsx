@@ -23,7 +23,8 @@ i18n.use(initReactI18next).init({
 
 const App: React.FC = () => {
   // Initialize URL from query parameter at component creation
-  const getInitialUrl = () => {
+  // Using lazy initialization to avoid calling getInitialUrl on every render
+  const [url, setUrl] = useState<string>(() => {
     const params = new URLSearchParams(window.location.search);
     const urlParam = params.get('url');
     if (urlParam) {
@@ -41,9 +42,7 @@ const App: React.FC = () => {
       }
     }
     return '';
-  };
-
-  const [url, setUrl] = useState<string>(getInitialUrl);
+  });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const { t } = useTranslation();
