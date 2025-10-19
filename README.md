@@ -7,7 +7,8 @@ This application provides a simple and effective way to display nursery messages
 * **Connect to ProPresenter Remotely**: Enter the network address of your ProPresenter instance to connect to it.
 * **View Available Messages**: The application will list all available messages from your ProPresenter setup.
 * **Fill in Message Tokens**: If a message contains tokens (e.g., for a child's name or number), you can easily fill them in before displaying the message.
-* **Real-time Updates**: The message list automatically refreshes every second, so you always have the most up-to-date information.
+* **Real-time Updates via WebSocket**: The application automatically attempts to connect using WebSocket for instant, real-time message updates with minimal latency.
+* **Automatic Fallback to Polling**: If WebSocket connection is unavailable or fails, the application seamlessly falls back to polling mode, refreshing the message list every second.
 * **Localized Interface**: The user interface is available in both English and German.
 
 ## How to Use
@@ -16,9 +17,29 @@ This section is for end-users who will be operating the application.
 
 1.  **Open the application** in your web browser.
 2.  **Enter the network address** for your ProPresenter instance in the input field (e.g., `http://localhost:1025`).
-3.  The application will automatically **fetch and display a list of available messages**.
-4.  For any message, **fill in the required token values** in the provided input fields.
-5.  Click the **"Show"** button to trigger the message in ProPresenter.
+3.  The application will automatically **attempt to connect via WebSocket** for real-time updates. If the WebSocket connection fails, it will automatically **fall back to polling mode**.
+4.  The application will **fetch and display a list of available messages**.
+5.  For any message, **fill in the required token values** in the provided input fields.
+6.  Click the **"Show"** button to trigger the message in ProPresenter.
+
+## Technical Details
+
+### Connection Modes
+
+The application uses two connection modes to ensure reliable communication with ProPresenter:
+
+1. **WebSocket Mode (Primary)**: 
+   - Provides real-time, bi-directional communication with ProPresenter
+   - Low latency updates when messages change
+   - Automatically reconnects on disconnection (up to 3 attempts)
+   - More efficient than polling, reducing network overhead
+
+2. **Polling Mode (Fallback)**: 
+   - Used when WebSocket connection is unavailable or fails
+   - Fetches message list every second via HTTP GET requests
+   - Ensures the application remains functional even if WebSocket is not supported
+
+The application automatically detects the best connection method and switches between them as needed, ensuring a seamless user experience.
 
 ## How to Run and Deploy for Developers
 
