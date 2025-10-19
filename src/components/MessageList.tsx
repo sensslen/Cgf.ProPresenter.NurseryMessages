@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { getMessages, triggerMessage } from '../api/proPresenter';
+import React, { useEffect, useCallback } from 'react';
+import { triggerMessage } from '../api/proPresenter';
 import { Message, TriggerPayloadToken } from '../types/proPresenter';
 import MessageItem from './MessageItem';
 import { useTranslation } from 'react-i18next';
+import { useProPresenterConnection } from '../hooks/useProPresenterConnection';
 
 interface MessageListProps {
     url: string;
@@ -11,37 +12,23 @@ interface MessageListProps {
 }
 
 const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) => {
-    const [messages, setMessages] = useState<Message[]>([]);
     const { t } = useTranslation();
 
-    // Fetch messages from the server
-    const fetchMessages = useCallback(async () => {
-        if (!url) return;
+    // Use the new hook that handles WebSocket with polling fallback
+    const { messages, connectionStatus, webSocketStatus } = useProPresenterConnection({
+        url,
+        pollingInterval: 1000,
+        enableWebSocket: true,
+        onError: (error) => {
+            setError(t('message-list.errors.failed-to-connect'));
+            console.error('Connection error:', error.message);
+        },
+    });
 
-        try {
-            const data = await getMessages(url);
-            setMessages(data);
-            setError(null); // Clear previous errors
-        } catch (error) {
-            if (error instanceof Error) {
-                setError(t('message-list.errors.failed-to-connect'));
-                console.error('Error fetching messages:', error.message);
-            } else {
-                setError(t("message-list.errors.unknown-error", { error }));
-                console.error('Unexpected error:', error);
-            }
-        }
-    }, [url, setError, t]);
-
-    // Fetch messages periodically
+    // Log connection status changes for debugging
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            fetchMessages();
-        }, 1000); // Refresh every second
-
-        // Cleanup interval on component unmount
-        return () => clearInterval(intervalId);
-    }, [fetchMessages]);
+        console.log(`Connection mode: ${connectionStatus}, WebSocket status: ${webSocketStatus}`);
+    }, [connectionStatus, webSocketStatus]);
     
     const renderMessageWithTokens = (message: string, tokenValues: { [key: string]: string }): string => {
         Object.entries(tokenValues).forEach(([name, value]) => {
@@ -50,7 +37,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) 
         return message;
     };
 
-    const handleShowMessage = async (message: Message, tokenValues: { [key: string]: string }) => {
+    const handleShowMessage = useCallback(async (message: Message, tokenValues: { [key: string]: string }) => {
         if (!url) return;
 
         const payload: TriggerPayloadToken[] = message.tokens.map((token) => {
@@ -83,7 +70,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) 
             setError(null); // Clear previous errors
             const formattedMessage = renderMessageWithTokens(message.message, tokenValues);
             setSuccess(t('message-list.success.message-shown-with-details', { message: formattedMessage })); // Set the success message
-            fetchMessages(); // Refresh messages after showing
+            // Messages will be updated automatically via WebSocket or polling
         } catch (error) {
             if (error instanceof Error) {
                 setError(t('message-list.errors.failed-to-show'));
@@ -93,7 +80,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) 
                 console.error('Unexpected error:', error);
             }
         }
-    };
+    }, [url, setError, setSuccess, t]);
 
     return (
         <div>
