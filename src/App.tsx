@@ -47,6 +47,7 @@ const App: React.FC = () => {
     return '';
   });
   const [error, setError] = useState<string | null>(null);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const { t } = useTranslation();
 
@@ -76,20 +77,40 @@ const App: React.FC = () => {
     }
   }, [success]);
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError('');
+      }, 3000); // Clear the error message after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   return (
-    <Suspense fallback={t("app.loading")}>
-      <div className="p-4">
-        {error && (
-          <div className="bg-red-500 text-white p-2 mb-4">
-            {error}
+    <Suspense fallback={t("app.loading")}> 
+      <div className="p-4 min-h-screen relative">
+        {/* Top fixed error/success banner, only one at a time */}
+        {(error || connectionError || success) && (
+          <div className="fixed top-0 left-0 w-full z-50 flex justify-center pointer-events-none">
+            {error && (
+              <div className="bg-red-500 text-white p-2 mt-2 rounded shadow pointer-events-auto">
+                {error}
+              </div>
+            )}
+            {!error && connectionError && (
+              <div className="bg-yellow-500 text-white p-2 mt-2 rounded shadow pointer-events-auto">
+                {connectionError}
+              </div>
+            )}
+            {!error && !connectionError && success && (
+              <div className="bg-green-500 text-white p-2 mt-2 rounded shadow pointer-events-auto">
+                {success}
+              </div>
+            )}
           </div>
         )}
-        {success && (
-          <div className="bg-green-500 text-white p-2 mb-4">
-            {success}
-          </div>
-        )}
-        <div className="mb-4">
+        {/* Main content */}
+        <div className="mb-4 pt-8">
           <input
             type="text"
             value={url}
@@ -103,6 +124,7 @@ const App: React.FC = () => {
             url={url}
             setError={setError}
             setSuccess={setSuccess}
+            setConnectionError={setConnectionError}
           />
         )}
       </div>

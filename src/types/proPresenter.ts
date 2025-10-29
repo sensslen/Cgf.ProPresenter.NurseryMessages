@@ -55,6 +55,7 @@ export interface Message {
     message: string;
     tokens: Token[];
     visible_on_network: boolean;
+    is_active?: boolean;
 }
 
 export interface TriggerPayloadToken {

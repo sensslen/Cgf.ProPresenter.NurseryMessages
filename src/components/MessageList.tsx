@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getMessages, triggerMessage } from '../api/proPresenter';
+import { getMessages, triggerMessage, clearMessage } from '../api/proPresenter';
 import { Message, TriggerPayloadToken } from '../types/proPresenter';
 import MessageItem from './MessageItem';
 import { useTranslation } from 'react-i18next';
@@ -7,10 +7,11 @@ import { useTranslation } from 'react-i18next';
 interface MessageListProps {
     url: string;
     setError: React.Dispatch<React.SetStateAction<string | null>>;
+    setConnectionError: React.Dispatch<React.SetStateAction<string | null>>;
     setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) => {
+const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionError, setSuccess }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const { t } = useTranslation();
 
@@ -21,10 +22,10 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) 
         try {
             const data = await getMessages(url);
             setMessages(data);
-            setError(null); // Clear previous errors
+            setConnectionError(null);
         } catch (error) {
             if (error instanceof Error) {
-                setError(t('message-list.errors.failed-to-connect'));
+                setConnectionError(t('message-list.errors.failed-to-connect'));
                 console.error('Error fetching messages:', error.message);
             } else {
                 setError(t("message-list.errors.unknown-error", { error }));
@@ -83,13 +84,32 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) 
             setError(null); // Clear previous errors
             const formattedMessage = renderMessageWithTokens(message.message, tokenValues);
             setSuccess(t('message-list.success.message-shown-with-details', { message: formattedMessage })); // Set the success message
-            fetchMessages(); // Refresh messages after showing
+            fetchMessages();
         } catch (error) {
             if (error instanceof Error) {
                 setError(t('message-list.errors.failed-to-show'));
                 console.error('Error triggering message:', error.message);
             } else {
                 setError(t("message-list.errors.unknown-error", { error }));
+                console.error('Unexpected error:', error);
+            }
+        }
+    };
+
+    // Handler for hiding a message (to be implemented)
+    const handleHideMessage = async (message: Message) => {
+        if (!url) return;
+        try {
+            await clearMessage(url, message.id.uuid);
+            setError(null);
+            setSuccess(t('message-list.success.message-hidden', { message: message.message }));
+            fetchMessages();
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(t('message-list.errors.failed-to-hide'));
+                console.error('Error hiding message:', error.message);
+            } else {
+                setError(t('message-list.errors.unknown-error', { error }));
                 console.error('Unexpected error:', error);
             }
         }
@@ -104,6 +124,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) 
                             key={message.id.uuid}
                             message={message}
                             onShowMessage={handleShowMessage}
+                            onHideMessage={handleHideMessage}
                         />
                     ))}
                 </ul>

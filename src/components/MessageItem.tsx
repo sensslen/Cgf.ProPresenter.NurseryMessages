@@ -6,9 +6,10 @@ import { Trans, useTranslation } from 'react-i18next';
 interface MessageItemProps {
     message: Message;
     onShowMessage: (message: Message, tokenValues: { [key: string]: string }) => void;
+    onHideMessage: (message: Message) => void;
 }
 
-const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage }) => {
+const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage, onHideMessage }) => {
     const { t } = useTranslation();
     const [tokenValues, setTokenValues] = useState<{ [key: string]: string }>(() => {
         // Initialize token values based on message tokens
@@ -43,14 +44,24 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage }) => 
             </div>
             <div className="mt-4 flex items-center gap-2">
                 <Trans i18nKey="message-item.formatted-message" t={t} components={{ description_format: <p className="text-sm font-medium text-gray-400" />, message_format: <p className="text-sm text-gray-700" /> }} values={{ message: renderMessageWithTokens(message.message) }} />
-            </div >
-            <button
-                onClick={() => onShowMessage(message, tokenValues)}
-                className="bg-green-500 text-white p-2 mt-2"
-            >
-                {t('message-item.show')}
-            </button>
-        </li >
+            </div>
+            <div className="flex gap-2 mt-2">
+                {(message.is_active === true) && (
+                    <button
+                        onClick={() => onHideMessage(message)}
+                        className="bg-red-500 text-white p-2"
+                    >
+                        {t('message-item.hide', 'Hide')}
+                    </button>
+                )}
+                <button
+                    onClick={() => onShowMessage(message, tokenValues)}
+                    className={"bg-green-500 text-white p-2"}
+                >
+                    {(message.is_active === true) ? t('message-item.show-again', 'Show again') : t('message-item.show', 'Show')}
+                </button>
+            </div>
+        </li>
     );
 };
 

@@ -36,6 +36,16 @@ export const triggerMessage = async (url: string, id: string, payload: TriggerPa
     }
 };
 
+export const clearMessage = async (url: string, id: string): Promise<void> => {
+    const resource = `${url}/v1/message/${id}/clear`;
+    try {
+        await axios.get(resource);
+    } catch (error) {
+        handleApiError(error);
+        throw new Error(`Failed to clear message at ${resource}`);
+    }
+};
+
 const handleApiError = (error: unknown) => {
     if (axios.isAxiosError(error)) {
         // Handle Axios-specific errors
