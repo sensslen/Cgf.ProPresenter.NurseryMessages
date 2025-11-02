@@ -21,5 +21,8 @@
         "show": "Show",
         "show-again": "Show again",
         "hide": "Hide"
+    },
+    "footer": {
+        "version": "Version {{version}}"
     }
 }
