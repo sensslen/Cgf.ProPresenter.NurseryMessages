@@ -32,7 +32,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
                 console.error('Unexpected error:', error);
             }
         }
-    }, [url, setError, t]);
+    }, [url, setError, setConnectionError, t]);
 
     // Fetch messages periodically
     useEffect(() => {
