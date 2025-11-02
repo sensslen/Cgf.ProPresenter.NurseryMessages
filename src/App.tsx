@@ -5,6 +5,12 @@ import i18n from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
 import localizationsEn from '../locales/en.json';
 import localizationsDe from '../locales/de.json';
+import localizationsZh from '../locales/zh.json';
+import localizationsHi from '../locales/hi.json';
+import localizationsEs from '../locales/es.json';
+import localizationsFr from '../locales/fr.json';
+import localizationsAr from '../locales/ar.json';
+import localizationsBn from '../locales/bn.json';
 import { encodeUrlToBase64, decodeBase64ToUrl } from './utils/urlEncoding';
 
 i18n.use(initReactI18next).init({
@@ -14,6 +20,24 @@ i18n.use(initReactI18next).init({
     },
     de: {
       translation: localizationsDe,
+    },
+    zh: {
+      translation: localizationsZh,
+    },
+    hi: {
+      translation: localizationsHi,
+    },
+    es: {
+      translation: localizationsEs,
+    },
+    fr: {
+      translation: localizationsFr,
+    },
+    ar: {
+      translation: localizationsAr,
+    },
+    bn: {
+      translation: localizationsBn,
     },
   },
   fallbackLng: 'en',

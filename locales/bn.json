@@ -1,0 +1,28 @@
+{
+    "app": {
+        "loading": "লোড হচ্ছে...",
+        "enterProPresenterUrl": "ProPresenter এর সাথে সংযোগ লিখুন"
+    },
+    "message-list": {
+        "errors": {
+            "failed-to-connect": "ProPresenter এর সাথে সংযোগ করতে ব্যর্থ হয়েছে। অনুগ্রহ করে সংযোগের তথ্য পরীক্ষা করুন।",
+            "unknown-error": "একটি অপ্রত্যাশিত ত্রুটি ঘটেছে: {{error}}।",
+            "failed-to-show": "বার্তা প্রদর্শন করতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
+            "failed-to-hide": "বার্তা লুকাতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"
+        },
+        "success": {
+            "message-shown": "বার্তা সফলভাবে প্রদর্শিত হয়েছে।",
+            "message-shown-with-details": "বার্তা \"{{message}}\" এখন প্রদর্শিত হয়েছে।",
+            "message-hidden": "বার্তা সফলভাবে লুকানো হয়েছে।"
+        }
+    },
+    "message-item": {
+        "formatted-message": "<description_format>বিন্যাসিত বার্তা:</description_format> <message_format>{{message}}</message_format>",
+        "show": "প্রদর্শন করুন",
+        "show-again": "আবার প্রদর্শন করুন",
+        "hide": "লুকান"
+    },
+    "footer": {
+        "version": "সংস্করণ {{version}}"
+    }
+}
