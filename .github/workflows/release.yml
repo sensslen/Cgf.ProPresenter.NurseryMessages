@@ -70,6 +70,7 @@ jobs:
             4. Access the application in your browser
             
             See the [README](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for more details.
+          generate_release_notes: true
           draft: false
           prerelease: ${{ steps.version.outputs.is_stable != 'true' }}
           files: |
