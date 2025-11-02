@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
-import { triggerMessage } from '../api/proPresenter';
+import { triggerMessage, clearMessage } from '../api/proPresenter';
 import { Message, TriggerPayloadToken } from '../types/proPresenter';
 import MessageItem from './MessageItem';
 import { useTranslation } from 'react-i18next';
@@ -8,10 +8,11 @@ import { useProPresenterConnection } from '../hooks/useProPresenterConnection';
 interface MessageListProps {
     url: string;
     setError: React.Dispatch<React.SetStateAction<string | null>>;
+    setConnectionError: React.Dispatch<React.SetStateAction<string | null>>;
     setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) => {
+const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionError, setSuccess }) => {
     const { t } = useTranslation();
 
     // Use the new hook that handles WebSocket with polling fallback
@@ -20,7 +21,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) 
         pollingInterval: 1000,
         enableWebSocket: true,
         onError: (error) => {
-            setError(t('message-list.errors.failed-to-connect'));
+            setConnectionError(t('message-list.errors.failed-to-connect'));
             console.error('Connection error:', error.message);
         },
     });
@@ -82,6 +83,24 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) 
         }
     }, [url, setError, setSuccess, t]);
 
+    const handleHideMessage = useCallback(async (message: Message) => {
+        if (!url) return;
+        try {
+            await clearMessage(url, message.id.uuid);
+            setError(null);
+            setSuccess(t('message-list.success.message-hidden', { message: message.message }));
+            // Messages will be updated automatically via WebSocket or polling
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(t('message-list.errors.failed-to-hide'));
+                console.error('Error hiding message:', error.message);
+            } else {
+                setError(t('message-list.errors.unknown-error', { error }));
+                console.error('Unexpected error:', error);
+            }
+        }
+    }, [url, setError, setSuccess, t]);
+
     return (
         <div>
             {messages.length > 0 && (
@@ -91,6 +110,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setSuccess }) 
                             key={message.id.uuid}
                             message={message}
                             onShowMessage={handleShowMessage}
+                            onHideMessage={handleHideMessage}
                         />
                     ))}
                 </ul>

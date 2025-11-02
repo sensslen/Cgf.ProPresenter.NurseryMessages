@@ -9,7 +9,7 @@ This application provides a simple and effective way to display nursery messages
 * **Fill in Message Tokens**: If a message contains tokens (e.g., for a child's name or number), you can easily fill them in before displaying the message.
 * **Real-time Updates via WebSocket**: The application automatically attempts to connect using WebSocket for instant, real-time message updates with minimal latency.
 * **Automatic Fallback to Polling**: If WebSocket connection is unavailable or fails, the application seamlessly falls back to polling mode, refreshing the message list every second.
-* **Localized Interface**: The user interface is available in both English and German.
+* **Localized Interface**: The user interface is available in multiple languages including English, German, Mandarin Chinese, Hindi, Spanish, French, Arabic, and Bengali. The application automatically detects your browser's language.
 
 ## How to Use
 
@@ -21,25 +21,6 @@ This section is for end-users who will be operating the application.
 4.  The application will **fetch and display a list of available messages**.
 5.  For any message, **fill in the required token values** in the provided input fields.
 6.  Click the **"Show"** button to trigger the message in ProPresenter.
-
-## Technical Details
-
-### Connection Modes
-
-The application uses two connection modes to ensure reliable communication with ProPresenter:
-
-1. **WebSocket Mode (Primary)**: 
-   - Provides real-time, bi-directional communication with ProPresenter
-   - Low latency updates when messages change
-   - Automatically reconnects on disconnection (up to 3 attempts)
-   - More efficient than polling, reducing network overhead
-
-2. **Polling Mode (Fallback)**: 
-   - Used when WebSocket connection is unavailable or fails
-   - Fetches message list every second via HTTP GET requests
-   - Ensures the application remains functional even if WebSocket is not supported
-
-The application automatically detects the best connection method and switches between them as needed, ensuring a seamless user experience.
 
 ## How to Run and Deploy for Developers
 
@@ -74,6 +55,50 @@ To deploy this application, you first need to build the static assets.
     * You can find instructions on how to set up `static-web-server` in their official documentation: [Static Web Server - Quick Start](https://static-web-server.net/getting-started/quick-start/)
 
 Once you have your web server set up, configure it to serve the files from the `dist` directory.
+
+## Technical Details
+
+### Connection Modes
+
+The application uses two connection modes to ensure reliable communication with ProPresenter:
+
+1. **WebSocket Mode (Primary)**: 
+   - Provides real-time, bi-directional communication with ProPresenter
+   - Low latency updates when messages change
+   - Automatically reconnects on disconnection (up to 3 attempts)
+   - More efficient than polling, reducing network overhead
+
+2. **Polling Mode (Fallback)**: 
+   - Used when WebSocket connection is unavailable or fails
+   - Fetches message list every second via HTTP GET requests
+   - Ensures the application remains functional even if WebSocket is not supported
+
+The application automatically detects the best connection method and switches between them as needed, ensuring a seamless user experience.
+
+## Releases
+
+This project uses automated releases via GitHub Actions. When a new version tag is pushed to the repository, the build pipeline automatically:
+
+1. Builds the application
+2. Creates a release archive containing all static files
+3. Creates a GitHub Release with the version number
+4. Uploads the build artifacts to the release
+
+### Creating a New Release
+
+To create a new release, maintainers should:
+
+1. Update the version number in `package.json` if needed
+2. Create and push a version tag:
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+3. The GitHub Actions workflow will automatically build and create the release
+
+### Downloading Releases
+
+Users can download pre-built releases from the [Releases page](https://github.com/sensslen/Cgf.ProPresenter.NurseryMessages/releases). Each release includes a ZIP file with all necessary files to deploy the application.
 
 ## License
 
