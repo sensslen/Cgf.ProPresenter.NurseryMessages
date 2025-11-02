@@ -21,5 +21,8 @@
         "show": "Anzeigen",
         "show-again": "Erneut anzeigen",
         "hide": "Ausblenden"
+    },
+    "footer": {
+        "version": "Version {{version}}"
     }
 }
