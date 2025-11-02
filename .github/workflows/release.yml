@@ -23,6 +23,15 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          
+          # Detect if this is a pre-release (contains beta, alpha, rc, etc.)
+          if [[ "$VERSION" =~ (beta|alpha|rc|preview|pre) ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+            echo "Detected pre-release version: $VERSION"
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+            echo "Detected stable version: $VERSION"
+          fi
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -73,6 +82,6 @@ jobs:
             
             See the [README](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.tag }}/README.md) for more details.
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.version.outputs.prerelease }}
           files: |
             cgf-propresenter-nurserymessages-${{ steps.version.outputs.version }}.zip
