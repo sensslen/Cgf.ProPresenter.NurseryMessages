@@ -53,45 +53,6 @@ jobs:
           zip -r ../cgf-propresenter-nurserymessages-${{ steps.version.outputs.full_without_prefix }}.zip .
           cd ..
       
-      - name: Generate changelog
-        id: changelog
-        run: |
-          # Get the previous tag
-          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | head -2 | tail -1)
-          
-          if [ -z "$PREVIOUS_TAG" ]; then
-            echo "No previous tag found, using first commit"
-            PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
-          fi
-          
-          echo "Generating changelog from $PREVIOUS_TAG to ${{ github.ref_name }}"
-          
-          # Generate changelog with commit messages
-          CHANGELOG=$(git log $PREVIOUS_TAG..${{ github.ref_name }} --pretty=format:"- %s (%h)" --no-merges)
-          
-          # Save changelog to file and output
-          echo "$CHANGELOG" > changelog.txt
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-      
-      - name: Get contributors
-        id: contributors
-        run: |
-          # Get list of contributors for this release
-          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | head -2 | tail -1)
-          
-          if [ -z "$PREVIOUS_TAG" ]; then
-            PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
-          fi
-          
-          # Get unique contributors
-          CONTRIBUTORS=$(git log $PREVIOUS_TAG..${{ github.ref_name }} --format="%aN" --no-merges | sort -u | sed 's/^/- @/' | sed 's/@copilot\[bot\]/@copilot/')
-          
-          echo "contributors<<EOF" >> $GITHUB_OUTPUT
-          echo "$CONTRIBUTORS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-      
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -109,20 +70,7 @@ jobs:
             4. Access the application in your browser
             
             See the [README](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for more details.
-            
-            ---
-            
-            ## Changelog
-            
-            ${{ steps.changelog.outputs.changelog }}
-            
-            ---
-            
-            ## Acknowledgements
-            
-            This release was made possible by the following contributors:
-            
-            ${{ steps.contributors.outputs.contributors }}
+          generate_release_notes: true
           draft: false
           prerelease: ${{ steps.version.outputs.is_stable != 'true' }}
           files: |
