@@ -54,6 +54,31 @@ To deploy this application, you first need to build the static assets.
 
 Once you have your web server set up, configure it to serve the files from the `dist` directory.
 
+## Releases
+
+This project uses automated releases via GitHub Actions. When a new version tag is pushed to the repository, the build pipeline automatically:
+
+1. Builds the application
+2. Creates a release archive containing all static files
+3. Creates a GitHub Release with the version number
+4. Uploads the build artifacts to the release
+
+### Creating a New Release
+
+To create a new release, maintainers should:
+
+1. Update the version number in `package.json` if needed
+2. Create and push a version tag:
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+3. The GitHub Actions workflow will automatically build and create the release
+
+### Downloading Releases
+
+Users can download pre-built releases from the [Releases page](https://github.com/sensslen/Cgf.ProPresenter.NurseryMessages/releases). Each release includes a ZIP file with all necessary files to deploy the application.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
