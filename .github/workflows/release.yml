@@ -16,22 +16,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
       
-      - name: Extract version from tag
+      - name: Check version format
+        uses: nowsprinting/check-version-format-action@v3
         id: version
-        run: |
-          # Extract version from tag (e.g., v1.0.0 -> 1.0.0)
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          
-          # Detect if this is a pre-release (contains beta, alpha, rc, etc.)
-          if [[ "$VERSION" =~ (beta|alpha|rc|preview|pre) ]]; then
-            echo "prerelease=true" >> $GITHUB_OUTPUT
-            echo "Detected pre-release version: $VERSION"
-          else
-            echo "prerelease=false" >> $GITHUB_OUTPUT
-            echo "Detected stable version: $VERSION"
-          fi
+        with:
+          prefix: 'v'
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -41,8 +30,8 @@ jobs:
       
       - name: Update package.json version
         run: |
-          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
-          echo "Updated package.json to version ${{ steps.version.outputs.version }}"
+          npm version ${{ steps.version.outputs.full_without_prefix }} --no-git-tag-version
+          echo "Updated package.json to version ${{ steps.version.outputs.full_without_prefix }}"
       
       - name: Install dependencies
         run: npm ci
@@ -61,18 +50,18 @@ jobs:
       - name: Create release archive
         run: |
           cd dist
-          zip -r ../cgf-propresenter-nurserymessages-${{ steps.version.outputs.version }}.zip .
+          zip -r ../cgf-propresenter-nurserymessages-${{ steps.version.outputs.full_without_prefix }}.zip .
           cd ..
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: Release ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.full_without_prefix }}
           body: |
-            ## Release ${{ steps.version.outputs.version }}
+            ## Release ${{ steps.version.outputs.full_without_prefix }}
             
             ### Download
-            Download the attached `cgf-propresenter-nurserymessages-${{ steps.version.outputs.version }}.zip` file and extract it to your web server.
+            Download the attached `cgf-propresenter-nurserymessages-${{ steps.version.outputs.full_without_prefix }}.zip` file and extract it to your web server.
             
             ### Installation
             1. Download the zip file below
@@ -80,8 +69,8 @@ jobs:
             3. Configure your web server to serve the files
             4. Access the application in your browser
             
-            See the [README](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.tag }}/README.md) for more details.
+            See the [README](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for more details.
           draft: false
-          prerelease: ${{ steps.version.outputs.prerelease }}
+          prerelease: ${{ steps.version.outputs.is_stable != 'true' }}
           files: |
-            cgf-propresenter-nurserymessages-${{ steps.version.outputs.version }}.zip
+            cgf-propresenter-nurserymessages-${{ steps.version.outputs.full_without_prefix }}.zip
