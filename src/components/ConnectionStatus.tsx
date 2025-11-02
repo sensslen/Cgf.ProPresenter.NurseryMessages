@@ -27,11 +27,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ status }) => {
 
     return (
         <div className="flex items-center gap-2 text-sm" role="status" aria-label={config.text}>
-            <span className={`${config.bg} w-3 h-3 rounded-full inline-block`}>
-                {status === 'connecting' && (
-                    <span className="animate-pulse block w-full h-full rounded-full"></span>
-                )}
-            </span>
+            <span className={`${config.bg} w-3 h-3 rounded-full inline-block ${status === 'connecting' ? 'animate-pulse' : ''}`} />
             <span className="font-medium">{config.text}</span>
         </div>
     );
