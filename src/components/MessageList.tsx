@@ -19,7 +19,6 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
     // Fetch messages from the server
     const fetchMessages = useCallback(async () => {
         if (!url) {
-            setConnectionStatus('disconnected');
             return;
         }
 
