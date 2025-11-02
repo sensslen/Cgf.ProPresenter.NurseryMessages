@@ -1,12 +1,7 @@
 {
     "app": {
         "loading": "Chargement...",
-        "enterProPresenterUrl": "Entrer la connexion à ProPresenter",
-        "connectionStatus": {
-            "connected": "Connecté",
-            "disconnected": "Déconnecté",
-            "connecting": "Connexion..."
-        }
+        "enterProPresenterUrl": "Entrer la connexion à ProPresenter"
     },
     "message-list": {
         "errors": {

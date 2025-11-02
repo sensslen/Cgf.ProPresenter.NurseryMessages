@@ -1,12 +1,7 @@
 {
     "app": {
         "loading": "লোড হচ্ছে...",
-        "enterProPresenterUrl": "ProPresenter এর সাথে সংযোগ লিখুন",
-        "connectionStatus": {
-            "connected": "সংযুক্ত",
-            "disconnected": "বিচ্ছিন্ন",
-            "connecting": "সংযোগ করা হচ্ছে..."
-        }
+        "enterProPresenterUrl": "ProPresenter এর সাথে সংযোগ লিখুন"
     },
     "message-list": {
         "errors": {

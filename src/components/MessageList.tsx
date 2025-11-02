@@ -9,27 +9,21 @@ interface MessageListProps {
     setError: React.Dispatch<React.SetStateAction<string | null>>;
     setConnectionError: React.Dispatch<React.SetStateAction<string | null>>;
     setSuccess: React.Dispatch<React.SetStateAction<string | null>>;
-    setConnectionStatus: React.Dispatch<React.SetStateAction<'connected' | 'disconnected' | 'connecting'>>;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionError, setSuccess, setConnectionStatus }) => {
+const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionError, setSuccess }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const { t } = useTranslation();
 
     // Fetch messages from the server
     const fetchMessages = useCallback(async () => {
-        if (!url) {
-            return;
-        }
+        if (!url) return;
 
-        setConnectionStatus('connecting');
         try {
             const data = await getMessages(url);
             setMessages(data);
             setConnectionError(null);
-            setConnectionStatus('connected');
         } catch (error) {
-            setConnectionStatus('disconnected');
             if (error instanceof Error) {
                 setConnectionError(t('message-list.errors.failed-to-connect'));
                 console.error('Error fetching messages:', error.message);
@@ -38,7 +32,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
                 console.error('Unexpected error:', error);
             }
         }
-    }, [url, setError, setConnectionError, setConnectionStatus, t]);
+    }, [url, setError, setConnectionError, t]);
 
     // Fetch messages periodically
     useEffect(() => {
