@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import MessageList from './components/MessageList';
 import Footer from './components/Footer';
+import ConnectionStatus from './components/ConnectionStatus';
 import i18n from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
 import localizationsEn from '../locales/en.json';
@@ -74,6 +75,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'connecting'>('disconnected');
   const { t } = useTranslation();
 
   const handleUrlChange = (newUrl: string) => {
@@ -136,13 +138,16 @@ const App: React.FC = () => {
         )}
         {/* Main content */}
         <div className="mb-4 pt-8">
-          <input
-            type="text"
-            value={url}
-            onChange={(e) => handleUrlChange(e.target.value)}
-            className="border p-2 w-full"
-            placeholder={t("app.enterProPresenterUrl")}
-          />
+          <div className="flex items-center gap-4 mb-2">
+            <input
+              type="text"
+              value={url}
+              onChange={(e) => handleUrlChange(e.target.value)}
+              className="border p-2 flex-1"
+              placeholder={t("app.enterProPresenterUrl")}
+            />
+            {url && <ConnectionStatus status={connectionStatus} />}
+          </div>
         </div>
         {url && (
           <MessageList
@@ -150,6 +155,7 @@ const App: React.FC = () => {
             setError={setError}
             setSuccess={setSuccess}
             setConnectionError={setConnectionError}
+            setConnectionStatus={setConnectionStatus}
           />
         )}
         <Footer />

@@ -1,7 +1,12 @@
 {
     "app": {
         "loading": "加载中...",
-        "enterProPresenterUrl": "输入连接到ProPresenter"
+        "enterProPresenterUrl": "输入连接到ProPresenter",
+        "connectionStatus": {
+            "connected": "已连接",
+            "disconnected": "已断开",
+            "connecting": "连接中..."
+        }
     },
     "message-list": {
         "errors": {

@@ -1,7 +1,12 @@
 {
     "app": {
         "loading": "جاري التحميل...",
-        "enterProPresenterUrl": "أدخل الاتصال بـ ProPresenter"
+        "enterProPresenterUrl": "أدخل الاتصال بـ ProPresenter",
+        "connectionStatus": {
+            "connected": "متصل",
+            "disconnected": "غير متصل",
+            "connecting": "جاري الاتصال..."
+        }
     },
     "message-list": {
         "errors": {

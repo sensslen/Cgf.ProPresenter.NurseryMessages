@@ -1,7 +1,12 @@
 {
     "app": {
         "loading": "लोड हो रहा है...",
-        "enterProPresenterUrl": "ProPresenter से कनेक्शन दर्ज करें"
+        "enterProPresenterUrl": "ProPresenter से कनेक्शन दर्ज करें",
+        "connectionStatus": {
+            "connected": "कनेक्टेड",
+            "disconnected": "डिस्कनेक्टेड",
+            "connecting": "कनेक्ट हो रहा है..."
+        }
     },
     "message-list": {
         "errors": {

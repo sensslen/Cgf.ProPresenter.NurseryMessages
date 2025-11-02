@@ -1,7 +1,12 @@
 {
     "app": {
         "loading": "Lade...",
-        "enterProPresenterUrl": "Verbindung zu ProPresenter eingeben"
+        "enterProPresenterUrl": "Verbindung zu ProPresenter eingeben",
+        "connectionStatus": {
+            "connected": "Verbunden",
+            "disconnected": "Getrennt",
+            "connecting": "Verbinden..."
+        }
     },
     "message-list": {
         "errors": {
