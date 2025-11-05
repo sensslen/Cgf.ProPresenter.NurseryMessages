@@ -12,8 +12,6 @@ import localizationsFr from '../locales/fr.json';
 import localizationsAr from '../locales/ar.json';
 import localizationsBn from '../locales/bn.json';
 import localizationsPt from '../locales/pt.json';
-import localizationsNl from '../locales/nl.json';
-import localizationsJa from '../locales/ja.json';
 import localizationsKo from '../locales/ko.json';
 import localizationsNo from '../locales/no.json';
 import localizationsCs from '../locales/cs.json';
@@ -48,12 +46,6 @@ i18n.use(initReactI18next).init({
     },
     pt: {
       translation: localizationsPt,
-    },
-    nl: {
-      translation: localizationsNl,
-    },
-    ja: {
-      translation: localizationsJa,
     },
     ko: {
       translation: localizationsKo,
