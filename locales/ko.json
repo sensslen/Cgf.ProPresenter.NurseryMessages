@@ -1,0 +1,28 @@
+{
+    "app": {
+        "loading": "로딩 중...",
+        "enterProPresenterUrl": "ProPresenter 연결 입력"
+    },
+    "message-list": {
+        "errors": {
+            "failed-to-connect": "ProPresenter 연결에 실패했습니다. 연결 정보를 확인하세요.",
+            "unknown-error": "예기치 않은 오류가 발생했습니다: {{error}}.",
+            "failed-to-show": "메시지 표시에 실패했습니다. 다시 시도하세요.",
+            "failed-to-hide": "메시지 숨기기에 실패했습니다. 다시 시도하세요."
+        },
+        "success": {
+            "message-shown": "메시지가 성공적으로 표시되었습니다.",
+            "message-shown-with-details": "메시지 \"{{message}}\"가 표시되고 있습니다.",
+            "message-hidden": "메시지가 성공적으로 숨겨졌습니다."
+        }
+    },
+    "message-item": {
+        "formatted-message": "<description_format>서식이 지정된 메시지:</description_format> <message_format>{{message}}</message_format>",
+        "show": "표시",
+        "show-again": "다시 표시",
+        "hide": "숨기기"
+    },
+    "footer": {
+        "version": "버전 {{version}}"
+    }
+}

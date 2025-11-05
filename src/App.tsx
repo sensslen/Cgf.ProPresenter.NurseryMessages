@@ -11,6 +11,11 @@ import localizationsEs from '../locales/es.json';
 import localizationsFr from '../locales/fr.json';
 import localizationsAr from '../locales/ar.json';
 import localizationsBn from '../locales/bn.json';
+import localizationsPt from '../locales/pt.json';
+import localizationsKo from '../locales/ko.json';
+import localizationsNo from '../locales/no.json';
+import localizationsCs from '../locales/cs.json';
+import localizationsRu from '../locales/ru.json';
 import { encodeUrlToBase64, decodeBase64ToUrl } from './utils/urlEncoding';
 
 i18n.use(initReactI18next).init({
@@ -38,6 +43,21 @@ i18n.use(initReactI18next).init({
     },
     bn: {
       translation: localizationsBn,
+    },
+    pt: {
+      translation: localizationsPt,
+    },
+    ko: {
+      translation: localizationsKo,
+    },
+    no: {
+      translation: localizationsNo,
+    },
+    cs: {
+      translation: localizationsCs,
+    },
+    ru: {
+      translation: localizationsRu,
     },
   },
   fallbackLng: 'en',
