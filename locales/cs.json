@@ -1,0 +1,28 @@
+{
+    "app": {
+        "loading": "Načítání...",
+        "enterProPresenterUrl": "Zadejte připojení k ProPresenter"
+    },
+    "message-list": {
+        "errors": {
+            "failed-to-connect": "Nepodařilo se připojit k ProPresenter. Zkontrolujte informace o připojení.",
+            "unknown-error": "Došlo k neočekávané chybě: {{error}}.",
+            "failed-to-show": "Nepodařilo se zobrazit zprávu. Zkuste to znovu.",
+            "failed-to-hide": "Nepodařilo se skrýt zprávu. Zkuste to znovu."
+        },
+        "success": {
+            "message-shown": "Zpráva byla úspěšně zobrazena.",
+            "message-shown-with-details": "Zpráva \"{{message}}\" je nyní zobrazena.",
+            "message-hidden": "Zpráva byla úspěšně skryta."
+        }
+    },
+    "message-item": {
+        "formatted-message": "<description_format>Formátovaná zpráva:</description_format> <message_format>{{message}}</message_format>",
+        "show": "Zobrazit",
+        "show-again": "Zobrazit znovu",
+        "hide": "Skrýt"
+    },
+    "footer": {
+        "version": "Verze {{version}}"
+    }
+}
