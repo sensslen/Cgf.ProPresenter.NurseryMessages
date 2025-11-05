@@ -8,7 +8,7 @@ This application provides a simple and effective way to display nursery messages
 * **View Available Messages**: The application will list all available messages from your ProPresenter setup.
 * **Fill in Message Tokens**: If a message contains tokens (e.g., for a child's name or number), you can easily fill them in before displaying the message.
 * **Real-time Updates**: The message list automatically refreshes every second, so you always have the most up-to-date information.
-* **Localized Interface**: The user interface is available in multiple languages including English, German, Mandarin Chinese, Hindi, Spanish, French, Arabic, and Bengali. The application automatically detects your browser's language.
+* **Localized Interface**: The user interface is available in multiple languages including English, German, Spanish, French, Portuguese, Dutch, Simplified Chinese, Japanese, Korean, Hindi, Arabic, and Bengali. The application automatically detects your browser's language.
 
 ## How to Use
 

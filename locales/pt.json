@@ -1,0 +1,28 @@
+{
+    "app": {
+        "loading": "Carregando...",
+        "enterProPresenterUrl": "Digite a conexão com o ProPresenter"
+    },
+    "message-list": {
+        "errors": {
+            "failed-to-connect": "Falha ao conectar ao ProPresenter. Verifique as informações de conexão.",
+            "unknown-error": "Ocorreu um erro inesperado: {{error}}.",
+            "failed-to-show": "Falha ao exibir a mensagem. Tente novamente.",
+            "failed-to-hide": "Falha ao ocultar a mensagem. Tente novamente."
+        },
+        "success": {
+            "message-shown": "Mensagem exibida com sucesso.",
+            "message-shown-with-details": "A mensagem \"{{message}}\" está sendo exibida.",
+            "message-hidden": "Mensagem ocultada com sucesso."
+        }
+    },
+    "message-item": {
+        "formatted-message": "<description_format>Mensagem formatada:</description_format> <message_format>{{message}}</message_format>",
+        "show": "Exibir",
+        "show-again": "Exibir novamente",
+        "hide": "Ocultar"
+    },
+    "footer": {
+        "version": "Versão {{version}}"
+    }
+}

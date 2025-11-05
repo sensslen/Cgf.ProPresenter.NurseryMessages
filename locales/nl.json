@@ -1,0 +1,28 @@
+{
+    "app": {
+        "loading": "Laden...",
+        "enterProPresenterUrl": "Voer verbinding met ProPresenter in"
+    },
+    "message-list": {
+        "errors": {
+            "failed-to-connect": "Kan geen verbinding maken met ProPresenter. Controleer de verbindingsinformatie.",
+            "unknown-error": "Er is een onverwachte fout opgetreden: {{error}}.",
+            "failed-to-show": "Kan bericht niet weergeven. Probeer het opnieuw.",
+            "failed-to-hide": "Kan bericht niet verbergen. Probeer het opnieuw."
+        },
+        "success": {
+            "message-shown": "Bericht succesvol weergegeven.",
+            "message-shown-with-details": "Bericht \"{{message}}\" wordt nu weergegeven.",
+            "message-hidden": "Bericht succesvol verborgen."
+        }
+    },
+    "message-item": {
+        "formatted-message": "<description_format>Geformatteerd bericht:</description_format> <message_format>{{message}}</message_format>",
+        "show": "Weergeven",
+        "show-again": "Opnieuw weergeven",
+        "hide": "Verbergen"
+    },
+    "footer": {
+        "version": "Versie {{version}}"
+    }
+}
