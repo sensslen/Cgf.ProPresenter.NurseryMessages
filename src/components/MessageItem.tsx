@@ -39,7 +39,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage, onHid
         const sanitizedMessage = DOMPurify.sanitize(message, {
             ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'u', 'br', 'p', 'span', 'a'],
             ALLOWED_ATTR: ['href', 'class'],
-            // Restrict href to safe protocols only (http, https, mailto)
+            // Restrict href to safe protocols only
+            // Note: http is included for compatibility with ProPresenter instances on local networks
             ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i
         });
         
