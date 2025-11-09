@@ -40,7 +40,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage, onHid
             ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'u', 'br', 'p', 'span', 'a'],
             ALLOWED_ATTR: ['href', 'class'],
             // Restrict href to safe protocols only (http, https, mailto)
-            ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i
+            ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i
         });
         
         return sanitizedMessage;
