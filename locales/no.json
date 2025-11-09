@@ -1,28 +1,29 @@
 {
-    "app": {
-        "loading": "Laster...",
-        "enterProPresenterUrl": "Skriv inn tilkobling til ProPresenter"
+  "app": {
+    "loading": "Laster...",
+    "enterProPresenterUrl": "Skriv inn tilkobling til ProPresenter"
+  },
+  "message-list": {
+    "errors": {
+      "failed-to-connect": "Kunne ikke koble til ProPresenter. Vennligst sjekk tilkoblingsinformasjonen.",
+      "unknown-error": "En uventet feil oppstod: {{error}}.",
+      "failed-to-show": "Kunne ikke vise meldingen. Vennligst prøv igjen.",
+      "failed-to-hide": "Kunne ikke skjule meldingen. Vennligst prøv igjen."
     },
-    "message-list": {
-        "errors": {
-            "failed-to-connect": "Kunne ikke koble til ProPresenter. Vennligst sjekk tilkoblingsinformasjonen.",
-            "unknown-error": "En uventet feil oppstod: {{error}}.",
-            "failed-to-show": "Kunne ikke vise meldingen. Vennligst prøv igjen.",
-            "failed-to-hide": "Kunne ikke skjule meldingen. Vennligst prøv igjen."
-        },
-        "success": {
-            "message-shown": "Melding vist.",
-            "message-shown-with-details": "Meldingen \"{{message}}\" vises nå.",
-            "message-hidden": "Melding skjult."
-        }
-    },
-    "message-item": {
-        "formatted-message": "<description_format>Formatert melding:</description_format> <message_format>{{message}}</message_format>",
-        "show": "Vis",
-        "show-again": "Vis igjen",
-        "hide": "Skjul"
-    },
-    "footer": {
-        "version": "Versjon {{version}}"
+    "success": {
+      "message-shown": "Melding vist.",
+      "message-shown-with-details": "Meldingen \"{{message}}\" vises nå.",
+      "message-hidden": "Melding skjult."
     }
+  },
+  "message-item": {
+    "formatted-message": "<description_format>Formatert melding:</description_format> <message_format>{{message}}</message_format>",
+    "show": "Vis",
+    "show-again": "Vis igjen",
+    "hide": "Skjul",
+    "formatted-message-label": "Formatert melding:"
+  },
+  "footer": {
+    "version": "Versjon {{version}}"
+  }
 }

@@ -1,28 +1,29 @@
 {
-    "app": {
-        "loading": "Загрузка...",
-        "enterProPresenterUrl": "Введите подключение к ProPresenter"
+  "app": {
+    "loading": "Загрузка...",
+    "enterProPresenterUrl": "Введите подключение к ProPresenter"
+  },
+  "message-list": {
+    "errors": {
+      "failed-to-connect": "Не удалось подключиться к ProPresenter. Проверьте информацию о подключении.",
+      "unknown-error": "Произошла непредвиденная ошибка: {{error}}.",
+      "failed-to-show": "Не удалось показать сообщение. Попробуйте еще раз.",
+      "failed-to-hide": "Не удалось скрыть сообщение. Попробуйте еще раз."
     },
-    "message-list": {
-        "errors": {
-            "failed-to-connect": "Не удалось подключиться к ProPresenter. Проверьте информацию о подключении.",
-            "unknown-error": "Произошла непредвиденная ошибка: {{error}}.",
-            "failed-to-show": "Не удалось показать сообщение. Попробуйте еще раз.",
-            "failed-to-hide": "Не удалось скрыть сообщение. Попробуйте еще раз."
-        },
-        "success": {
-            "message-shown": "Сообщение успешно отображено.",
-            "message-shown-with-details": "Сообщение \"{{message}}\" отображается.",
-            "message-hidden": "Сообщение успешно скрыто."
-        }
-    },
-    "message-item": {
-        "formatted-message": "<description_format>Форматированное сообщение:</description_format> <message_format>{{message}}</message_format>",
-        "show": "Показать",
-        "show-again": "Показать снова",
-        "hide": "Скрыть"
-    },
-    "footer": {
-        "version": "Версия {{version}}"
+    "success": {
+      "message-shown": "Сообщение успешно отображено.",
+      "message-shown-with-details": "Сообщение \"{{message}}\" отображается.",
+      "message-hidden": "Сообщение успешно скрыто."
     }
+  },
+  "message-item": {
+    "formatted-message": "<description_format>Форматированное сообщение:</description_format> <message_format>{{message}}</message_format>",
+    "show": "Показать",
+    "show-again": "Показать снова",
+    "hide": "Скрыть",
+    "formatted-message-label": "Форматированное сообщение:"
+  },
+  "footer": {
+    "version": "Версия {{version}}"
+  }
 }

@@ -1,28 +1,29 @@
 {
-    "app": {
-        "loading": "Cargando...",
-        "enterProPresenterUrl": "Ingrese la conexión a ProPresenter"
+  "app": {
+    "loading": "Cargando...",
+    "enterProPresenterUrl": "Ingrese la conexión a ProPresenter"
+  },
+  "message-list": {
+    "errors": {
+      "failed-to-connect": "Error al conectar con ProPresenter. Por favor, verifique la información de conexión.",
+      "unknown-error": "Ocurrió un error inesperado: {{error}}.",
+      "failed-to-show": "Error al mostrar el mensaje. Por favor, inténtelo de nuevo.",
+      "failed-to-hide": "Error al ocultar el mensaje. Por favor, inténtelo de nuevo."
     },
-    "message-list": {
-        "errors": {
-            "failed-to-connect": "Error al conectar con ProPresenter. Por favor, verifique la información de conexión.",
-            "unknown-error": "Ocurrió un error inesperado: {{error}}.",
-            "failed-to-show": "Error al mostrar el mensaje. Por favor, inténtelo de nuevo.",
-            "failed-to-hide": "Error al ocultar el mensaje. Por favor, inténtelo de nuevo."
-        },
-        "success": {
-            "message-shown": "Mensaje mostrado exitosamente.",
-            "message-shown-with-details": "El mensaje \"{{message}}\" se muestra ahora.",
-            "message-hidden": "Mensaje ocultado exitosamente."
-        }
-    },
-    "message-item": {
-        "formatted-message": "<description_format>Mensaje formateado:</description_format> <message_format>{{message}}</message_format>",
-        "show": "Mostrar",
-        "show-again": "Mostrar de nuevo",
-        "hide": "Ocultar"
-    },
-    "footer": {
-        "version": "Versión {{version}}"
+    "success": {
+      "message-shown": "Mensaje mostrado exitosamente.",
+      "message-shown-with-details": "El mensaje \"{{message}}\" se muestra ahora.",
+      "message-hidden": "Mensaje ocultado exitosamente."
     }
+  },
+  "message-item": {
+    "formatted-message": "<description_format>Mensaje formateado:</description_format> <message_format>{{message}}</message_format>",
+    "show": "Mostrar",
+    "show-again": "Mostrar de nuevo",
+    "hide": "Ocultar",
+    "formatted-message-label": "Mensaje formateado:"
+  },
+  "footer": {
+    "version": "Versión {{version}}"
+  }
 }

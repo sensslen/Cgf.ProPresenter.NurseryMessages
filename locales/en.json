@@ -1,28 +1,29 @@
 {
-    "app": {
-        "loading": "Loading...",
-        "enterProPresenterUrl": "Enter connection to ProPresenter"
+  "app": {
+    "loading": "Loading...",
+    "enterProPresenterUrl": "Enter connection to ProPresenter"
+  },
+  "message-list": {
+    "errors": {
+      "failed-to-connect": "Failed to connect to ProPresenter. Please check the connection information.",
+      "unknown-error": "An unexpected error occurred: {{error}}.",
+      "failed-to-show": "Failed to show message. Please try again.",
+      "failed-to-hide": "Failed to hide message. Please try again."
     },
-    "message-list": {
-        "errors": {
-            "failed-to-connect": "Failed to connect to ProPresenter. Please check the connection information.",
-            "unknown-error": "An unexpected error occurred: {{error}}.",
-            "failed-to-show": "Failed to show message. Please try again.",
-            "failed-to-hide": "Failed to hide message. Please try again."
-        },
-        "success": {
-            "message-shown": "Message successfully shown.",
-            "message-shown-with-details": "Message \"{{message}}\" is now shown.",
-            "message-hidden": "Message successfully hidden."
-        }
-    },
-    "message-item": {
-        "formatted-message": "<description_format>Formatted message:</description_format> <message_format>{{message}}</message_format>",
-        "show": "Show",
-        "show-again": "Show again",
-        "hide": "Hide"
-    },
-    "footer": {
-        "version": "Version {{version}}"
+    "success": {
+      "message-shown": "Message successfully shown.",
+      "message-shown-with-details": "Message \"{{message}}\" is now shown.",
+      "message-hidden": "Message successfully hidden."
     }
+  },
+  "message-item": {
+    "formatted-message": "<description_format>Formatted message:</description_format> <message_format>{{message}}</message_format>",
+    "formatted-message-label": "Formatted message:",
+    "show": "Show",
+    "show-again": "Show again",
+    "hide": "Hide"
+  },
+  "footer": {
+    "version": "Version {{version}}"
+  }
 }

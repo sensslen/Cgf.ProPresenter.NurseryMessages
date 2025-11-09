@@ -1,28 +1,29 @@
 {
-    "app": {
-        "loading": "جاري التحميل...",
-        "enterProPresenterUrl": "أدخل الاتصال بـ ProPresenter"
+  "app": {
+    "loading": "جاري التحميل...",
+    "enterProPresenterUrl": "أدخل الاتصال بـ ProPresenter"
+  },
+  "message-list": {
+    "errors": {
+      "failed-to-connect": "فشل الاتصال بـ ProPresenter. يرجى التحقق من معلومات الاتصال.",
+      "unknown-error": "حدث خطأ غير متوقع: {{error}}.",
+      "failed-to-show": "فشل في عرض الرسالة. يرجى المحاولة مرة أخرى.",
+      "failed-to-hide": "فشل في إخفاء الرسالة. يرجى المحاولة مرة أخرى."
     },
-    "message-list": {
-        "errors": {
-            "failed-to-connect": "فشل الاتصال بـ ProPresenter. يرجى التحقق من معلومات الاتصال.",
-            "unknown-error": "حدث خطأ غير متوقع: {{error}}.",
-            "failed-to-show": "فشل في عرض الرسالة. يرجى المحاولة مرة أخرى.",
-            "failed-to-hide": "فشل في إخفاء الرسالة. يرجى المحاولة مرة أخرى."
-        },
-        "success": {
-            "message-shown": "تم عرض الرسالة بنجاح.",
-            "message-shown-with-details": "الرسالة \"{{message}}\" معروضة الآن.",
-            "message-hidden": "تم إخفاء الرسالة بنجاح."
-        }
-    },
-    "message-item": {
-        "formatted-message": "<description_format>رسالة منسقة:</description_format> <message_format>{{message}}</message_format>",
-        "show": "عرض",
-        "show-again": "عرض مرة أخرى",
-        "hide": "إخفاء"
-    },
-    "footer": {
-        "version": "الإصدار {{version}}"
+    "success": {
+      "message-shown": "تم عرض الرسالة بنجاح.",
+      "message-shown-with-details": "الرسالة \"{{message}}\" معروضة الآن.",
+      "message-hidden": "تم إخفاء الرسالة بنجاح."
     }
+  },
+  "message-item": {
+    "formatted-message": "<description_format>رسالة منسقة:</description_format> <message_format>{{message}}</message_format>",
+    "show": "عرض",
+    "show-again": "عرض مرة أخرى",
+    "hide": "إخفاء",
+    "formatted-message-label": "رسالة منسقة:"
+  },
+  "footer": {
+    "version": "الإصدار {{version}}"
+  }
 }
