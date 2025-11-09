@@ -1,28 +1,28 @@
 {
-    "app": {
-        "loading": "लोड हो रहा है...",
-        "enterProPresenterUrl": "ProPresenter से कनेक्शन दर्ज करें"
+  "app": {
+    "loading": "लोड हो रहा है...",
+    "enterProPresenterUrl": "ProPresenter से कनेक्शन दर्ज करें"
+  },
+  "message-list": {
+    "errors": {
+      "failed-to-connect": "ProPresenter से कनेक्ट करने में विफल। कृपया कनेक्शन जानकारी की जांच करें।",
+      "unknown-error": "एक अप्रत्याशित त्रुटि हुई: {{error}}।",
+      "failed-to-show": "संदेश दिखाने में विफल। कृपया पुनः प्रयास करें।",
+      "failed-to-hide": "संदेश छिपाने में विफल। कृपया पुनः प्रयास करें।"
     },
-    "message-list": {
-        "errors": {
-            "failed-to-connect": "ProPresenter से कनेक्ट करने में विफल। कृपया कनेक्शन जानकारी की जांच करें।",
-            "unknown-error": "एक अप्रत्याशित त्रुटि हुई: {{error}}।",
-            "failed-to-show": "संदेश दिखाने में विफल। कृपया पुनः प्रयास करें।",
-            "failed-to-hide": "संदेश छिपाने में विफल। कृपया पुनः प्रयास करें।"
-        },
-        "success": {
-            "message-shown": "संदेश सफलतापूर्वक दिखाया गया।",
-            "message-shown-with-details": "संदेश \"{{message}}\" अब दिखाया गया है।",
-            "message-hidden": "संदेश सफलतापूर्वक छुपाया गया।"
-        }
-    },
-    "message-item": {
-        "formatted-message": "<description_format>स्वरूपित संदेश:</description_format> <message_format>{{message}}</message_format>",
-        "show": "दिखाएं",
-        "show-again": "फिर से दिखाएं",
-        "hide": "छुपाएं"
-    },
-    "footer": {
-        "version": "संस्करण {{version}}"
+    "success": {
+      "message-shown": "संदेश सफलतापूर्वक दिखाया गया।",
+      "message-shown-with-details": "संदेश \"{{message}}\" अब दिखाया गया है।",
+      "message-hidden": "संदेश सफलतापूर्वक छुपाया गया।"
     }
+  },
+  "message-item": {
+    "formatted-message": "<0>स्वरूपित संदेश:</0> <1>{{message}}</1>",
+    "show": "दिखाएं",
+    "show-again": "फिर से दिखाएं",
+    "hide": "छुपाएं"
+  },
+  "footer": {
+    "version": "संस्करण {{version}}"
+  }
 }

@@ -1,28 +1,28 @@
 {
-    "app": {
-        "loading": "加载中...",
-        "enterProPresenterUrl": "输入连接到ProPresenter"
+  "app": {
+    "loading": "加载中...",
+    "enterProPresenterUrl": "输入连接到ProPresenter"
+  },
+  "message-list": {
+    "errors": {
+      "failed-to-connect": "连接到ProPresenter失败。请检查连接信息。",
+      "unknown-error": "发生意外错误：{{error}}。",
+      "failed-to-show": "显示消息失败。请重试。",
+      "failed-to-hide": "隐藏消息失败。请重试。"
     },
-    "message-list": {
-        "errors": {
-            "failed-to-connect": "连接到ProPresenter失败。请检查连接信息。",
-            "unknown-error": "发生意外错误：{{error}}。",
-            "failed-to-show": "显示消息失败。请重试。",
-            "failed-to-hide": "隐藏消息失败。请重试。"
-        },
-        "success": {
-            "message-shown": "消息成功显示。",
-            "message-shown-with-details": "消息\"{{message}}\"现已显示。",
-            "message-hidden": "消息成功隐藏。"
-        }
-    },
-    "message-item": {
-        "formatted-message": "<description_format>格式化消息：</description_format> <message_format>{{message}}</message_format>",
-        "show": "显示",
-        "show-again": "再次显示",
-        "hide": "隐藏"
-    },
-    "footer": {
-        "version": "版本 {{version}}"
+    "success": {
+      "message-shown": "消息成功显示。",
+      "message-shown-with-details": "消息\"{{message}}\"现已显示。",
+      "message-hidden": "消息成功隐藏。"
     }
+  },
+  "message-item": {
+    "formatted-message": "<0>格式化消息：</0> <1>{{message}}</1>",
+    "show": "显示",
+    "show-again": "再次显示",
+    "hide": "隐藏"
+  },
+  "footer": {
+    "version": "版本 {{version}}"
+  }
 }

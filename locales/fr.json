@@ -1,28 +1,28 @@
 {
-    "app": {
-        "loading": "Chargement...",
-        "enterProPresenterUrl": "Entrer la connexion à ProPresenter"
+  "app": {
+    "loading": "Chargement...",
+    "enterProPresenterUrl": "Entrer la connexion à ProPresenter"
+  },
+  "message-list": {
+    "errors": {
+      "failed-to-connect": "Échec de la connexion à ProPresenter. Veuillez vérifier les informations de connexion.",
+      "unknown-error": "Une erreur inattendue s'est produite : {{error}}.",
+      "failed-to-show": "Échec de l'affichage du message. Veuillez réessayer.",
+      "failed-to-hide": "Échec du masquage du message. Veuillez réessayer."
     },
-    "message-list": {
-        "errors": {
-            "failed-to-connect": "Échec de la connexion à ProPresenter. Veuillez vérifier les informations de connexion.",
-            "unknown-error": "Une erreur inattendue s'est produite : {{error}}.",
-            "failed-to-show": "Échec de l'affichage du message. Veuillez réessayer.",
-            "failed-to-hide": "Échec du masquage du message. Veuillez réessayer."
-        },
-        "success": {
-            "message-shown": "Message affiché avec succès.",
-            "message-shown-with-details": "Le message \"{{message}}\" est maintenant affiché.",
-            "message-hidden": "Message masqué avec succès."
-        }
-    },
-    "message-item": {
-        "formatted-message": "<description_format>Message formaté :</description_format> <message_format>{{message}}</message_format>",
-        "show": "Afficher",
-        "show-again": "Afficher à nouveau",
-        "hide": "Masquer"
-    },
-    "footer": {
-        "version": "Version {{version}}"
+    "success": {
+      "message-shown": "Message affiché avec succès.",
+      "message-shown-with-details": "Le message \"{{message}}\" est maintenant affiché.",
+      "message-hidden": "Message masqué avec succès."
     }
+  },
+  "message-item": {
+    "formatted-message": "<0>Message formaté :</0> <1>{{message}}</1>",
+    "show": "Afficher",
+    "show-again": "Afficher à nouveau",
+    "hide": "Masquer"
+  },
+  "footer": {
+    "version": "Version {{version}}"
+  }
 }
