@@ -26,8 +26,11 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage, onHid
     const renderMessageWithTokens = (message: string): string => {
         // First, sanitize each token value to prevent XSS
         Object.entries(tokenValues).forEach(([name, value]) => {
-            // Sanitize the token value (strip all HTML tags from user input)
-            const sanitizedValue = DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
+            // Sanitize the token value (strip all HTML tags and attributes from user input)
+            const sanitizedValue = DOMPurify.sanitize(value, { 
+                ALLOWED_TAGS: [],
+                ALLOWED_ATTR: []
+            });
             message = message.replace(`{${name}}`, sanitizedValue);
         });
         
@@ -35,7 +38,9 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage, onHid
         // This allows XML/HTML tags in the message template while protecting against XSS
         const sanitizedMessage = DOMPurify.sanitize(message, {
             ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'u', 'br', 'p', 'span', 'a'],
-            ALLOWED_ATTR: ['href', 'class']
+            ALLOWED_ATTR: ['href', 'class'],
+            // Restrict href to safe protocols only (http, https, mailto)
+            ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i
         });
         
         return sanitizedMessage;
