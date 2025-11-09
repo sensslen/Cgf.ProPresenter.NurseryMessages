@@ -17,11 +17,10 @@
     }
   },
   "message-item": {
-    "formatted-message": "<description_format>বিন্যাসিত বার্তা:</description_format> <message_format>{{message}}</message_format>",
+    "formatted-message": "<0>বিন্যাসিত বার্তা:</0> <1>{{message}}</1>",
     "show": "প্রদর্শন করুন",
     "show-again": "আবার প্রদর্শন করুন",
-    "hide": "লুকান",
-    "formatted-message-label": "বিন্যাসিত বার্তা:"
+    "hide": "লুকান"
   },
   "footer": {
     "version": "সংস্করণ {{version}}"

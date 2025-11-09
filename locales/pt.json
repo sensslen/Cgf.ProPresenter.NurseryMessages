@@ -17,11 +17,10 @@
     }
   },
   "message-item": {
-    "formatted-message": "<description_format>Mensagem formatada:</description_format> <message_format>{{message}}</message_format>",
+    "formatted-message": "<0>Mensagem formatada:</0> <1>{{message}}</1>",
     "show": "Exibir",
     "show-again": "Exibir novamente",
-    "hide": "Ocultar",
-    "formatted-message-label": "Mensagem formatada:"
+    "hide": "Ocultar"
   },
   "footer": {
     "version": "Versão {{version}}"

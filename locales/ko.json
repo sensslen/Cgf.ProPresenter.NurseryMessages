@@ -17,11 +17,10 @@
     }
   },
   "message-item": {
-    "formatted-message": "<description_format>서식이 지정된 메시지:</description_format> <message_format>{{message}}</message_format>",
+    "formatted-message": "<0>서식이 지정된 메시지:</0> <1>{{message}}</1>",
     "show": "표시",
     "show-again": "다시 표시",
-    "hide": "숨기기",
-    "formatted-message-label": "서식이 지정된 메시지:"
+    "hide": "숨기기"
   },
   "footer": {
     "version": "버전 {{version}}"

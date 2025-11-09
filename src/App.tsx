@@ -63,6 +63,10 @@ i18n.use(initReactI18next).init({
   fallbackLng: 'en',
   interpolation: {
     escapeValue: false,
+  },
+  react: {
+    transSupportBasicHtmlNodes: true,
+    transKeepBasicHtmlNodesFor: ['br', 'strong', 'i', 'b', 'p', 'span', 'em', 'u', 'a']
   }
 });
 

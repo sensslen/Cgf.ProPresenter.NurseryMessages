@@ -17,11 +17,10 @@
     }
   },
   "message-item": {
-    "formatted-message": "<description_format>Formátovaná zpráva:</description_format> <message_format>{{message}}</message_format>",
+    "formatted-message": "<0>Formátovaná zpráva:</0> <1>{{message}}</1>",
     "show": "Zobrazit",
     "show-again": "Zobrazit znovu",
-    "hide": "Skrýt",
-    "formatted-message-label": "Formátovaná zpráva:"
+    "hide": "Skrýt"
   },
   "footer": {
     "version": "Verze {{version}}"

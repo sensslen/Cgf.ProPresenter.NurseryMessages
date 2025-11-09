@@ -17,11 +17,10 @@
     }
   },
   "message-item": {
-    "formatted-message": "<description_format>Formatert melding:</description_format> <message_format>{{message}}</message_format>",
+    "formatted-message": "<0>Formatert melding:</0> <1>{{message}}</1>",
     "show": "Vis",
     "show-again": "Vis igjen",
-    "hide": "Skjul",
-    "formatted-message-label": "Formatert melding:"
+    "hide": "Skjul"
   },
   "footer": {
     "version": "Versjon {{version}}"

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Message } from '../types/proPresenter';
 import TokenInput from './TokenInput';
-import { useTranslation } from 'react-i18next';
-import DOMPurify from 'dompurify';
+import { Trans, useTranslation } from 'react-i18next';
 
 interface MessageItemProps {
     message: Message;
@@ -24,27 +23,10 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage, onHid
     });
 
     const renderMessageWithTokens = (message: string): string => {
-        // First, sanitize each token value to prevent XSS
         Object.entries(tokenValues).forEach(([name, value]) => {
-            // Sanitize the token value (strip all HTML tags and attributes from user input)
-            const sanitizedValue = DOMPurify.sanitize(value, { 
-                ALLOWED_TAGS: [],
-                ALLOWED_ATTR: []
-            });
-            message = message.replace(`{${name}}`, sanitizedValue);
+            message = message.replace(`{${name}}`, value);
         });
-        
-        // Then sanitize the entire message, allowing safe HTML tags
-        // This allows XML/HTML tags in the message template while protecting against XSS
-        const sanitizedMessage = DOMPurify.sanitize(message, {
-            ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'u', 'br', 'p', 'span', 'a'],
-            ALLOWED_ATTR: ['href', 'class'],
-            // Restrict href to safe protocols only
-            // Note: http is included for compatibility with ProPresenter instances on local networks
-            ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i
-        });
-        
-        return sanitizedMessage;
+        return message;
     };
 
     return (
@@ -61,11 +43,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage, onHid
                 ))}
             </div>
             <div className="mt-4 flex items-center gap-2">
-                <p className="text-sm font-medium text-gray-400">{t('message-item.formatted-message-label', 'Formatted message:')}</p>
-                <p 
-                    className="text-sm text-gray-700"
-                    dangerouslySetInnerHTML={{ __html: renderMessageWithTokens(message.message) }}
-                />
+                <Trans i18nKey="message-item.formatted-message" t={t} components={[<p className="text-sm font-medium text-gray-400" />, <p className="text-sm text-gray-700" />]} values={{ message: renderMessageWithTokens(message.message) }} shouldUnescape />
             </div>
             <div className="flex gap-2 mt-2">
                 {(message.is_active === true) && (

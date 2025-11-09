@@ -17,11 +17,10 @@
     }
   },
   "message-item": {
-    "formatted-message": "<description_format>Форматированное сообщение:</description_format> <message_format>{{message}}</message_format>",
+    "formatted-message": "<0>Форматированное сообщение:</0> <1>{{message}}</1>",
     "show": "Показать",
     "show-again": "Показать снова",
-    "hide": "Скрыть",
-    "formatted-message-label": "Форматированное сообщение:"
+    "hide": "Скрыть"
   },
   "footer": {
     "version": "Версия {{version}}"

@@ -17,8 +17,7 @@
     }
   },
   "message-item": {
-    "formatted-message": "<description_format>Formatted message:</description_format> <message_format>{{message}}</message_format>",
-    "formatted-message-label": "Formatted message:",
+    "formatted-message": "<0>Formatted message:</0> <1>{{message}}</1>",
     "show": "Show",
     "show-again": "Show again",
     "hide": "Hide"

@@ -17,11 +17,10 @@
     }
   },
   "message-item": {
-    "formatted-message": "<description_format>格式化消息：</description_format> <message_format>{{message}}</message_format>",
+    "formatted-message": "<0>格式化消息：</0> <1>{{message}}</1>",
     "show": "显示",
     "show-again": "再次显示",
-    "hide": "隐藏",
-    "formatted-message-label": "格式化消息："
+    "hide": "隐藏"
   },
   "footer": {
     "version": "版本 {{version}}"

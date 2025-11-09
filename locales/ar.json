@@ -17,11 +17,10 @@
     }
   },
   "message-item": {
-    "formatted-message": "<description_format>رسالة منسقة:</description_format> <message_format>{{message}}</message_format>",
+    "formatted-message": "<0>رسالة منسقة:</0> <1>{{message}}</1>",
     "show": "عرض",
     "show-again": "عرض مرة أخرى",
-    "hide": "إخفاء",
-    "formatted-message-label": "رسالة منسقة:"
+    "hide": "إخفاء"
   },
   "footer": {
     "version": "الإصدار {{version}}"
