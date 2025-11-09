@@ -35,7 +35,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage, onHid
         // This allows XML/HTML tags in the message template while protecting against XSS
         const sanitizedMessage = DOMPurify.sanitize(message, {
             ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'u', 'br', 'p', 'span', 'a'],
-            ALLOWED_ATTR: ['href', 'target', 'class', 'style']
+            ALLOWED_ATTR: ['href', 'class']
         });
         
         return sanitizedMessage;
