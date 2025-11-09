@@ -43,7 +43,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage, onHid
                 ))}
             </div>
             <div className="mt-4 flex items-center gap-2">
-                <Trans i18nKey="message-item.formatted-message" t={t} components={{ description_format: <p className="text-sm font-medium text-gray-400" />, message_format: <p className="text-sm text-gray-700" /> }} values={{ message: renderMessageWithTokens(message.message) }} shouldUnescape />
+                <Trans i18nKey="message-item.formatted-message" t={t} components={[<p className="text-sm font-medium text-gray-400" />, <p className="text-sm text-gray-700" />]} values={{ message: renderMessageWithTokens(message.message) }} shouldUnescape />
             </div>
             <div className="flex gap-2 mt-2">
                 {(message.is_active === true) && (
