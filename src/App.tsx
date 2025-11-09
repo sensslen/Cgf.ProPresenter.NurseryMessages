@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import MessageList from './components/MessageList';
-import Footer from './components/Footer';
 import i18n from 'i18next';
+import { APP_VERSION } from './utils/version';
 import { initReactI18next, useTranslation } from 'react-i18next';
 import localizationsEn from '../locales/en.json';
 import localizationsDe from '../locales/de.json';
@@ -132,8 +132,8 @@ const App: React.FC = () => {
   }, [error]);
 
   return (
-    <Suspense fallback={t("app.loading")}> 
-      <div className="p-4 min-h-screen relative pb-12">
+    <Suspense fallback={t("app.loading")}>
+      <div className="p-4 min-h-screen relative pb-12 fixed bottom-0">
         {/* Top fixed error/success banner, only one at a time */}
         {(error || connectionError || success) && (
           <div className="fixed top-0 left-0 w-full z-50 flex justify-center pointer-events-none">
@@ -172,7 +172,9 @@ const App: React.FC = () => {
             setConnectionError={setConnectionError}
           />
         )}
-        <Footer />
+        <footer className="fixed bottom-0 left-0 w-full bg-linear-to-t from-60% from-white to-white/0 text-gray-600 text-center text-xs z-10 h-8 flex items-end justify-center p-1">
+          {t('footer.version', { version: APP_VERSION })}
+        </footer>
       </div>
     </Suspense>
   );
