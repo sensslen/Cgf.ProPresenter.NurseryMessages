@@ -50,7 +50,7 @@ To deploy this application, you first need to build the static assets.
     This command will create a `dist` directory containing the optimized static files for your application (HTML, CSS, and JavaScript).
 
 2.  **Host the `dist` directory** with any static web server. A simple option is the `static-web-server` tool.
-    * You can find instructions on how to set up `static-web-server` in their official documentation: [Static Web Server - Quick Start](https://static-web-server.net/getting-started/quick-start/)
+    * You can find instructions on how to set up `static-web-server` in their official documentation: [Static Web Server - Getting Started](https://static-web-server.net/getting-started/)
 
 Once you have your web server set up, configure it to serve the files from the `dist` directory.
 
