@@ -50,8 +50,13 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
     }, [setConnectionError]);
 
     const handleClose = useCallback((): void => {
-        // Stream closed naturally - don't treat as error, just let it be
-        // If needed, the parent can decide when to reconnect
+        // Stream closed naturally - treat as transient and schedule reconnect
+        // Check if this was an abort (user/code explicitly cancelled) or natural close
+        // If not aborted, attempt to reconnect
+        if (streamAbortRef.current && !streamAbortRef.current.signal.aborted) {
+            // Clean close without abort - trigger reconnect
+            latestAttemptReconnectRef.current(new Error('Stream closed unexpectedly'));
+        }
     }, []);
 
     // Establish or re-establish the stream connection
@@ -82,6 +87,12 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
     // Implement retry/backoff for transient failures
     // No dependency on establishConnection - calls via ref instead
     const attemptReconnect = useCallback((_errorArg: unknown) => {
+        // Clear any existing pending retry to prevent overlapping reconnection attempts
+        if (retryTimeoutRef.current) {
+            clearTimeout(retryTimeoutRef.current);
+            retryTimeoutRef.current = null;
+        }
+        
         // Calculate exponential backoff with jitter
         // Base delay: 1000ms, max delay: 30000ms
         const baseDelay = 1000;
@@ -102,12 +113,21 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
     // Handle errors with reconnection backoff
     // No dependency on attemptReconnect - calls via ref instead
     const handleError = useCallback((err: unknown) => {
-        // Error during streaming - set error and schedule reconnection with backoff
-        setConnectionError(t('message-list.errors.failed-to-connect'));
-        // Do not clear messages here - let attemptReconnect/establishConnection handle retry logic
-        // which will preserve messages if this is a retry
-        console.error('Streaming error:', err);
-        latestAttemptReconnectRef.current(err);
+        // Check if this is a validation error (deterministic, not transient)
+        const isValidationError = 
+            (err instanceof Error && err.message.includes('Invalid URL format')) ||
+            (err instanceof Error && err.message.includes('validation'));
+        
+        if (isValidationError) {
+            // Validation errors are deterministic - don't reconnect, wait for user correction
+            setConnectionError(t('message-list.errors.failed-to-connect'));
+            console.error('Validation error:', err);
+        } else {
+            // All other errors are transient - set error and schedule reconnection with backoff
+            setConnectionError(t('message-list.errors.failed-to-connect'));
+            console.error('Streaming error:', err);
+            latestAttemptReconnectRef.current(err);
+        }
     }, [t, setConnectionError]);
 
     // Update refs with the latest callback implementations

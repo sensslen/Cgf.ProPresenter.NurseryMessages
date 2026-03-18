@@ -107,17 +107,20 @@ export const streamMessages = (
                     while (true) {
                         const { value, done } = await reader.read();
                         if (done) {
-                            // Try to flush any remaining JSON in buffer
-                            if (buffer.trim()) {
-                                const extracted = extractNextJson(buffer);
-                                if (extracted) {
-                                    try {
-                                        const parsed = JSON.parse(extracted.json);
-                                        onChunk(parsed as any);
-                                    } catch (err) {
-                                        console.error('Failed to parse final chunk', err);
-                                    }
+                            // Flush the TextDecoder to get any remaining bytes
+                            buffer += decoder.decode();
+                            
+                            // Drain the entire buffer using the same while-loop as streaming
+                            let extracted = extractNextJson(buffer);
+                            while (extracted) {
+                                try {
+                                    const parsed = JSON.parse(extracted.json);
+                                    onChunk(parsed as any);
+                                } catch (err) {
+                                    console.error('Failed to parse chunk', err);
                                 }
+                                buffer = extracted.rest;
+                                extracted = extractNextJson(buffer);
                             }
                             onClose && onClose();
                             break;

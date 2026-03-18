@@ -20,7 +20,9 @@ export const replaceAllTokens = (
         const escapedName = escapeRegexChars(name);
         // Use global regex to replace ALL occurrences of each token
         const regex = new RegExp(`\\{${escapedName}\\}`, 'g');
-        result = result.replace(regex, value);
+        // Use a function replacer to insert the token value literally and avoid pattern interpretation
+        // (prevents special replacement patterns like $&, $1, $$ from being interpreted)
+        result = result.replace(regex, () => String(value));
     });
     return result;
 };
