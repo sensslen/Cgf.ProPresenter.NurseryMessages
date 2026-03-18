@@ -16,8 +16,14 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
     const [messages, setMessages] = useState<Message[]>([]);
     const { t } = useTranslation();
     const streamAbortRef = useRef<AbortController | null>(null);
-    const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const retryCountRef = useRef(0);
+    const isRetryRef = useRef(false); // Track if current connection attempt is a retry
+
+    // Refs to store the latest callback versions to break circular dependency
+    const latestHandleErrorRef = useRef<(err: unknown) => void>(() => {});
+    const latestAttemptReconnectRef = useRef<(errorArg: unknown) => void>(() => {});
+    const latestEstablishConnectionRef = useRef<(isRetry: boolean) => void>(() => {});
 
     // Memoized handlers to prevent stale closures
     const handleChunk = useCallback((data: Message[] | Message) => {
@@ -40,10 +46,42 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
     const handleOpen = useCallback(() => {
         setConnectionError(null);
         retryCountRef.current = 0; // Reset retry count on successful connection
+        isRetryRef.current = false;
     }, [setConnectionError]);
 
+    const handleClose = useCallback((): void => {
+        // Stream closed naturally - don't treat as error, just let it be
+        // If needed, the parent can decide when to reconnect
+    }, []);
+
+    // Establish or re-establish the stream connection
+    // No dependencies on handleError/attemptReconnect - calls via refs instead
+    const establishConnection = useCallback((isRetry: boolean) => {
+        if (!url) return;
+
+        // Only clear messages on initial connection, not on retries
+        if (!isRetry) {
+            setMessages([]);
+        }
+
+        try {
+            // Cancel any existing stream before starting a new one
+            streamAbortRef.current?.abort();
+            
+            // streamMessages is now synchronous and returns the controller immediately
+            // The async connection logic runs in the background
+            // Use refs for callbacks to avoid circular dependency
+            streamAbortRef.current = streamMessages(url, handleChunk, handleOpen, handleClose, (err) => {
+                latestHandleErrorRef.current(err);
+            });
+        } catch (err) {
+            latestHandleErrorRef.current(err);
+        }
+    }, [url, handleChunk, handleOpen, handleClose]);
+
     // Implement retry/backoff for transient failures
-    const attemptReconnect = useCallback((errorArg: unknown) => {
+    // No dependency on establishConnection - calls via ref instead
+    const attemptReconnect = useCallback((_errorArg: unknown) => {
         // Calculate exponential backoff with jitter
         // Base delay: 1000ms, max delay: 30000ms
         const baseDelay = 1000;
@@ -54,26 +92,31 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
 
         retryCountRef.current++;
 
-        // Schedule reconnection attempt
+        // Schedule reconnection attempt using ref to avoid circular dependency
         retryTimeoutRef.current = setTimeout(() => {
-            // Trigger a reconnection by abort+retry (the effect will handle this)
-            streamAbortRef.current?.abort();
+            isRetryRef.current = true;
+            latestEstablishConnectionRef.current(true); // Reconnect without clearing messages
         }, totalDelay);
     }, []);
 
-    const handleClose = useCallback((): void => {
-        // Stream closed - check if this was intentional (abort) or transient error
-        // The effect will determine if reconnection is needed via URL changes
-        // Abort-triggered closes are handled differently from natural closes
-    }, []);
-
+    // Handle errors with reconnection backoff
+    // No dependency on attemptReconnect - calls via ref instead
     const handleError = useCallback((err: unknown) => {
         // Error during streaming - set error and schedule reconnection with backoff
         setConnectionError(t('message-list.errors.failed-to-connect'));
-        setMessages([]);
+        // Do not clear messages here - let attemptReconnect/establishConnection handle retry logic
+        // which will preserve messages if this is a retry
         console.error('Streaming error:', err);
-        attemptReconnect(err);
-    }, [t, setConnectionError, attemptReconnect]);
+        latestAttemptReconnectRef.current(err);
+    }, [t, setConnectionError]);
+
+    // Update refs with the latest callback implementations
+    // This effect captures the current versions without creating circular dependencies
+    useEffect(() => {
+        latestHandleErrorRef.current = handleError;
+        latestAttemptReconnectRef.current = attemptReconnect;
+        latestEstablishConnectionRef.current = establishConnection;
+    }, [handleError, attemptReconnect, establishConnection]);
 
     // Stream messages from the server using the chunked endpoint
     useEffect(() => {
@@ -81,26 +124,17 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             setMessages([]);
             setConnectionError(null); // Clear error when URL is removed
             retryCountRef.current = 0;
+            isRetryRef.current = false;
             return;
         }
 
-        // Clear previous messages while (re)connecting so UI only shows messages when connected
-        setMessages([]);
+        // Reset retry state when handling a new URL to treat it as a fresh connection
+        isRetryRef.current = false;
+        retryCountRef.current = 0;
 
-        try {
-            // Cancel any existing stream and retry timeout before starting a new one
-            streamAbortRef.current?.abort();
-            if (retryTimeoutRef.current) {
-                clearTimeout(retryTimeoutRef.current);
-                retryTimeoutRef.current = null;
-            }
-            
-            // streamMessages is now synchronous and returns the controller immediately
-            // The async connection logic runs in the background
-            streamAbortRef.current = streamMessages(url, handleChunk, handleOpen, handleClose, handleError);
-        } catch (err) {
-            handleError(err);
-        }
+        // Establish initial connection using the latest ref version
+        // Call via ref to avoid circular dependency issues
+        latestEstablishConnectionRef.current(isRetryRef.current);
 
         return () => {
             try {
@@ -114,7 +148,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
                 retryTimeoutRef.current = null;
             }
         };
-    }, [url, handleChunk, handleOpen, handleClose, handleError]);
+    }, [url, setConnectionError]);
     
     const renderMessageWithTokens = (message: string, tokenValues: { [key: string]: string }): string => {
         return replaceAllTokens(message, tokenValues);
