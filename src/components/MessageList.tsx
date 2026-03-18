@@ -75,10 +75,36 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             
             // streamMessages is now synchronous and returns the controller immediately
             // The async connection logic runs in the background
-            // Use refs for callbacks to avoid circular dependency
-            streamAbortRef.current = streamMessages(url, handleChunk, handleOpen, handleClose, (err) => {
-                latestHandleErrorRef.current(err);
-            });
+            // Capture the controller in a local const to scope callbacks to this exact instance
+            // This prevents old stream callbacks from invoking handlers for new streams
+            const controller = streamMessages(
+                url,
+                (data) => {
+                    // Only process if this controller is still the active one
+                    if (streamAbortRef.current === controller) {
+                        handleChunk(data);
+                    }
+                },
+                () => {
+                    // Only process if this controller is still the active one
+                    if (streamAbortRef.current === controller) {
+                        handleOpen();
+                    }
+                },
+                () => {
+                    // Only process if this controller is still the active one
+                    if (streamAbortRef.current === controller) {
+                        handleClose();
+                    }
+                },
+                (err) => {
+                    // Only process if this controller is still the active one
+                    if (streamAbortRef.current === controller) {
+                        latestHandleErrorRef.current(err);
+                    }
+                }
+            );
+            streamAbortRef.current = controller;
         } catch (err) {
             latestHandleErrorRef.current(err);
         }
