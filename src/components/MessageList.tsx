@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { getMessages, triggerMessage, clearMessage } from '../api/proPresenter';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { streamMessages, triggerMessage, clearMessage } from '../api/proPresenter';
 import { Message, TriggerPayloadToken } from '../types/proPresenter';
 import MessageItem from './MessageItem';
 import { useTranslation } from 'react-i18next';
@@ -14,35 +14,69 @@ interface MessageListProps {
 const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionError, setSuccess }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const { t } = useTranslation();
+    const streamAbortRef = useRef<AbortController | null>(null);
 
-    // Fetch messages from the server
-    const fetchMessages = useCallback(async () => {
-        if (!url) return;
-
-        try {
-            const data = await getMessages(url);
+    // Memoized handlers to prevent stale closures
+    const handleChunk = useCallback((data: Message[] | Message) => {
+        if (Array.isArray(data)) {
             setMessages(data);
-            setConnectionError(null);
-        } catch (error) {
-            if (error instanceof Error) {
-                setConnectionError(t('message-list.errors.failed-to-connect'));
-                console.error('Error fetching messages:', error.message);
-            } else {
-                setError(t("message-list.errors.unknown-error", { error }));
-                console.error('Unexpected error:', error);
-            }
+            return;
         }
-    }, [url, setError, setConnectionError, t]);
 
-    // Fetch messages periodically
+        setMessages((prev) => {
+            const idx = prev.findIndex((m) => m.id.uuid === data.id.uuid);
+            if (idx >= 0) {
+                const copy = [...prev];
+                copy[idx] = data;
+                return copy;
+            }
+            return [...prev, data];
+        });
+    }, []);
+
+    const handleOpen = useCallback(() => {
+        setConnectionError(null);
+    }, [setConnectionError]);
+
+    const handleClose = useCallback(() => {
+        // Stream closed normally - don't treat as error if we have messages
+        // Only clear if absolutely necessary; messages already exist
+    }, []);
+
+    const handleError = useCallback((err: unknown) => {
+        setConnectionError(t('message-list.errors.failed-to-connect'));
+        setMessages([]);
+        console.error('Streaming error:', err);
+    }, [t, setConnectionError]);
+
+    // Stream messages from the server using the chunked endpoint
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            fetchMessages();
-        }, 1000); // Refresh every second
+        if (!url) {
+            setMessages([]);
+            return;
+        }
 
-        // Cleanup interval on component unmount
-        return () => clearInterval(intervalId);
-    }, [fetchMessages]);
+        // Clear previous messages while (re)connecting so UI only shows messages when connected
+        setMessages([]);
+
+        (async () => {
+            try {
+                // Cancel any existing stream before starting a new one
+                streamAbortRef.current?.abort();
+                streamAbortRef.current = await streamMessages(url, handleChunk, handleOpen, handleClose, handleError);
+            } catch (err) {
+                handleError(err);
+            }
+        })();
+
+        return () => {
+            try {
+                streamAbortRef.current?.abort();
+            } catch (e) {
+                // ignore
+            }
+        };
+    }, [url, handleChunk, handleOpen, handleClose, handleError]);
     
     const renderMessageWithTokens = (message: string, tokenValues: { [key: string]: string }): string => {
         Object.entries(tokenValues).forEach(([name, value]) => {
@@ -84,7 +118,6 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             setError(null); // Clear previous errors
             const formattedMessage = renderMessageWithTokens(message.message, tokenValues);
             setSuccess(t('message-list.success.message-shown-with-details', { message: formattedMessage })); // Set the success message
-            fetchMessages();
         } catch (error) {
             if (error instanceof Error) {
                 setError(t('message-list.errors.failed-to-show'));
@@ -103,7 +136,6 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             await clearMessage(url, message.id.uuid);
             setError(null);
             setSuccess(t('message-list.success.message-hidden', { message: message.message }));
-            fetchMessages();
         } catch (error) {
             if (error instanceof Error) {
                 setError(t('message-list.errors.failed-to-hide'));

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Token } from '../types/proPresenter';
 
 interface TokenInputProps {
@@ -8,6 +8,10 @@ interface TokenInputProps {
 }
 
 const TokenInput: React.FC<TokenInputProps> = ({ token, tokenValue, setTokenValue }) => {
+    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setTokenValue(e.target.value);
+    }, [setTokenValue]);
+
     return (
         <div className="my-2">
             <label className="block">{token.name}</label>
@@ -15,7 +19,7 @@ const TokenInput: React.FC<TokenInputProps> = ({ token, tokenValue, setTokenValu
                 type="text"
                 value={tokenValue}
                 placeholder={token.name}
-                onChange={(e) => setTokenValue(e.target.value)}
+                onChange={handleChange}
                 className="border p-2 w-full"
             />
         </div>

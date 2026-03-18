@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Message } from '../types/proPresenter';
 import TokenInput from './TokenInput';
 import { Trans, useTranslation } from 'react-i18next';
@@ -22,12 +22,12 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onShowMessage, onHid
         return initialTokenValues;
     });
 
-    const renderMessageWithTokens = (message: string): string => {
+    const renderMessageWithTokens = useCallback((messageStr: string): string => {
         Object.entries(tokenValues).forEach(([name, value]) => {
-            message = message.replace(`{${name}}`, value);
+            messageStr = messageStr.replace(`{${name}}`, value);
         });
-        return message;
-    };
+        return messageStr;
+    }, [tokenValues]);
 
     return (
         <li className="mb-4 p-2 border">
