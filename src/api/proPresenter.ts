@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Ajv from 'ajv';
+import { z } from 'zod';
 import { Message, TriggerPayload } from '../types/proPresenter';
 
 // Custom error class for stream failures with typed status code
@@ -14,40 +14,35 @@ export class StreamError extends Error {
     }
 }
 
-const ajv = new Ajv();
+// Zod schema for Message validation
+const messageIdSchema = z.object({
+    uuid: z.string(),
+    index: z.number(),
+    name: z.string()
+});
 
-// Reusable schema for Message object structure
-const messageObjectSchema = {
-    type: 'object',
-    properties: {
-        id: {
-            type: 'object',
-            properties: {
-                uuid: { type: 'string' },
-                index: { type: 'number' },
-                name: { type: 'string' }
-            },
-            required: ['uuid', 'index', 'name']
-        },
-        message: { type: 'string' },
-        tokens: { type: 'array' },
-        visible_on_network: { type: 'boolean' }
-    },
-    required: ['id', 'message', 'tokens', 'visible_on_network']
+const messageObjectSchema = z.object({
+    id: messageIdSchema,
+    message: z.string(),
+    tokens: z.array(z.any()), // tokens have complex optional structure, validate as array of any
+    visible_on_network: z.boolean()
+});
+
+// Accept either a single message or an array of messages
+const messageSchema = z.union([
+    messageObjectSchema,
+    z.array(messageObjectSchema)
+]);
+
+const validateMessage = (data: unknown) => {
+    const result = messageSchema.safeParse(data);
+    // Cast to proper Message type since we've validated the structure
+    return {
+        success: result.success,
+        data: result.success ? (result.data as Message | Message[]) : undefined,
+        error: result.error
+    };
 };
-
-// JSON Schema for Message validation
-const messageSchema = {
-    oneOf: [
-        messageObjectSchema,
-        {
-            type: 'array',
-            items: messageObjectSchema
-        }
-    ]
-};
-
-const validateMessage = ajv.compile(messageSchema);
 
 const isValidUrl = (inputUrl: string): boolean => {
     try {
@@ -167,10 +162,11 @@ export const streamMessages = (
                             while (extracted) {
                                 try {
                                     const parsed = JSON.parse(extracted.json);
-                                    if (validateMessage(parsed)) {
-                                        onChunk(parsed as unknown as Message | Message[]);
+                                    const validation = validateMessage(parsed);
+                                    if (validation.success && validation.data) {
+                                        onChunk(validation.data);
                                     } else {
-                                        console.error('Invalid message format in chunk', validateMessage.errors);
+                                        console.error('Invalid message format in chunk', validation.error);
                                     }
                                 } catch (err) {
                                     console.error('Failed to parse chunk', err);
@@ -188,10 +184,11 @@ export const streamMessages = (
                         while (extracted) {
                             try {
                                 const parsed = JSON.parse(extracted.json);
-                                if (validateMessage(parsed)) {
-                                    onChunk(parsed as unknown as Message | Message[]);
+                                const validation = validateMessage(parsed);
+                                if (validation.success && validation.data) {
+                                    onChunk(validation.data);
                                 } else {
-                                    console.error('Invalid message format in stream', validateMessage.errors);
+                                    console.error('Invalid message format in stream', validation.error);
                                 }
                             } catch (err) {
                                 console.error('Failed to parse chunked JSON', err);
