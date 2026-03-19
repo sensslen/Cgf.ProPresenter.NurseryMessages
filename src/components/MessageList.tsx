@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { getMessages, triggerMessage, clearMessage } from '../api/proPresenter';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { streamMessages, triggerMessage, clearMessage, StreamError } from '../api/proPresenter';
 import { Message, TriggerPayloadToken } from '../types/proPresenter';
 import MessageItem from './MessageItem';
 import { useTranslation } from 'react-i18next';
+import { replaceAllTokens } from '../utils/tokenReplacement';
 
 interface MessageListProps {
     url: string;
@@ -14,41 +15,224 @@ interface MessageListProps {
 const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionError, setSuccess }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const { t } = useTranslation();
+    const streamAbortRef = useRef<AbortController | null>(null);
+    const connectionTokenRef = useRef<{ id: number } | null>(null); // Token to identify active connection
+    const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const retryCountRef = useRef(0);
+    const isRetryRef = useRef(false); // Track if current connection attempt is a retry
 
-    // Fetch messages from the server
-    const fetchMessages = useCallback(async () => {
+    // Refs to store the latest callback versions to break circular dependency
+    const latestHandleErrorRef = useRef<(err: unknown) => void>(() => {});
+    const latestAttemptReconnectRef = useRef<(errorArg: unknown) => void>(() => {});
+    const latestEstablishConnectionRef = useRef<(isRetry: boolean) => void>(() => {});
+
+    // Memoized handlers to prevent stale closures
+    const handleChunk = useCallback((data: Message[] | Message) => {
+        if (Array.isArray(data)) {
+            setMessages(data);
+            return;
+        }
+
+        setMessages((prev) => {
+            const idx = prev.findIndex((m) => m.id.uuid === data.id.uuid);
+            if (idx >= 0) {
+                const copy = [...prev];
+                copy[idx] = data;
+                return copy;
+            }
+            return [...prev, data];
+        });
+    }, []);
+
+    const handleOpen = useCallback(() => {
+        setConnectionError(null);
+        retryCountRef.current = 0; // Reset retry count on successful connection
+        isRetryRef.current = false;
+    }, [setConnectionError]);
+
+    const handleClose = useCallback((): void => {
+        // Stream closed naturally - treat as transient and schedule reconnect
+        // Check if this was an abort (user/code explicitly cancelled) or natural close
+        // If not aborted, attempt to reconnect
+        if (streamAbortRef.current && !streamAbortRef.current.signal.aborted) {
+            // Clean close without abort - trigger reconnect
+            latestAttemptReconnectRef.current(new Error('Stream closed unexpectedly'));
+        }
+    }, []);
+
+    // Establish or re-establish the stream connection
+    // No dependencies on handleError/attemptReconnect - calls via refs instead
+    const establishConnection = useCallback((isRetry: boolean) => {
         if (!url) return;
 
+        // Only clear messages on initial connection, not on retries
+        if (!isRetry) {
+            setMessages([]);
+        }
+
         try {
-            const data = await getMessages(url);
-            setMessages(data);
-            setConnectionError(null);
-        } catch (error) {
-            if (error instanceof Error) {
-                setConnectionError(t('message-list.errors.failed-to-connect'));
-                console.error('Error fetching messages:', error.message);
-            } else {
-                setError(t("message-list.errors.unknown-error", { error }));
-                console.error('Unexpected error:', error);
+            // Cancel any existing stream before starting a new one
+            streamAbortRef.current?.abort();
+            
+            // Create a token object to uniquely identify this connection attempt
+            // Assign it BEFORE calling streamMessages so that synchronous callbacks
+            // can identify the active connection
+            const connectionToken = { id: Math.random() };
+            connectionTokenRef.current = connectionToken;
+            
+            // streamMessages is now synchronous and returns the controller immediately
+            // The async connection logic runs in the background
+            // Use the token in callbacks to scope callbacks to this exact instance
+            const controller = streamMessages(
+                url,
+                (data) => {
+                    // Only process if this is still the active connection
+                    if (connectionTokenRef.current === connectionToken) {
+                        handleChunk(data);
+                    }
+                },
+                () => {
+                    // Only process if this is still the active connection
+                    if (connectionTokenRef.current === connectionToken) {
+                        handleOpen();
+                    }
+                },
+                () => {
+                    // Only process if this is still the active connection
+                    if (connectionTokenRef.current === connectionToken) {
+                        handleClose();
+                    }
+                },
+                (err) => {
+                    // Only process if this is still the active connection
+                    if (connectionTokenRef.current === connectionToken) {
+                        latestHandleErrorRef.current(err);
+                    }
+                }
+            );
+            // Store the actual controller for cleanup/abort
+            streamAbortRef.current = controller;
+        } catch (err) {
+            latestHandleErrorRef.current(err);
+        }
+    }, [url, handleChunk, handleOpen, handleClose]);
+
+    // Implement retry/backoff for transient failures
+    // No dependency on establishConnection - calls via ref instead
+    const attemptReconnect = useCallback((_errorArg: unknown) => {
+        // Clear any existing pending retry to prevent overlapping reconnection attempts
+        if (retryTimeoutRef.current) {
+            clearTimeout(retryTimeoutRef.current);
+            retryTimeoutRef.current = null;
+        }
+        
+        // Calculate exponential backoff with jitter
+        // Base delay: 1000ms, max delay: 30000ms
+        const baseDelay = 1000;
+        const maxDelay = 30000;
+        const backoffDelay = Math.min(baseDelay * Math.pow(2, retryCountRef.current), maxDelay);
+        const jitter = Math.random() * 0.3 * backoffDelay; // 0-30% jitter
+        const totalDelay = backoffDelay + jitter;
+
+        retryCountRef.current++;
+
+        // Schedule reconnection attempt using ref to avoid circular dependency
+        retryTimeoutRef.current = setTimeout(() => {
+            isRetryRef.current = true;
+            latestEstablishConnectionRef.current(true); // Reconnect without clearing messages
+        }, totalDelay);
+    }, []);
+
+    // Handle errors with reconnection backoff
+    // No dependency on attemptReconnect - calls via ref instead
+    const handleError = useCallback((err: unknown) => {
+        // Check if this is a validation error (deterministic, not transient)
+        const isValidationError = 
+            (err instanceof Error && err.message.includes('Invalid URL format')) ||
+            (err instanceof Error && err.message.includes('validation'));
+        
+        // Check if this is a terminal stream failure (deterministic, not transient)
+        let isTerminalError = false;
+        let statusCode: number | undefined;
+        
+        if (err instanceof StreamError) {
+            statusCode = err.statusCode;
+        } else if (err instanceof Error) {
+            // Fallback for any previously cast errors (defensive)
+            statusCode = (err as any).statusCode;
+        }
+        
+        if (statusCode) {
+            // Retryable errors (occur when remote is down/comes back):
+            // - 404: endpoint might come back
+            // - 408: request timeout (remote temporarily unavailable)
+            // - 429: rate limiting (transient)
+            // - 5xx: server errors (service temporarily down)
+            const isRetryable = (statusCode === 404 || statusCode === 408 || statusCode === 429) ||
+                               (statusCode >= 500);
+            
+            // All other status codes (400-412, 413-427, 430-499) are terminal
+            if (!isRetryable) {
+                isTerminalError = true;
             }
         }
-    }, [url, setError, setConnectionError, t]);
+        
+        if (isValidationError || isTerminalError) {
+            // Deterministic errors - don't reconnect, wait for user correction
+            setConnectionError(t('message-list.errors.failed-to-connect'));
+            console.error(isValidationError ? 'Validation error:' : 'Terminal error:', err);
+        } else {
+            // All other errors are transient (timeouts, 404, 408, 429, 5xx) - set error and schedule reconnection with backoff
+            setConnectionError(t('message-list.errors.failed-to-connect'));
+            console.error('Streaming error:', err);
+            latestAttemptReconnectRef.current(err);
+        }
+    }, [t, setConnectionError]);
 
-    // Fetch messages periodically
+    // Update refs with the latest callback implementations
+    // This effect captures the current versions without creating circular dependencies
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            fetchMessages();
-        }, 1000); // Refresh every second
+        latestHandleErrorRef.current = handleError;
+        latestAttemptReconnectRef.current = attemptReconnect;
+        latestEstablishConnectionRef.current = establishConnection;
+    }, [handleError, attemptReconnect, establishConnection]);
 
-        // Cleanup interval on component unmount
-        return () => clearInterval(intervalId);
-    }, [fetchMessages]);
+    // Stream messages from the server using the chunked endpoint
+    useEffect(() => {
+        if (!url) {
+            setMessages([]);
+            setConnectionError(null); // Clear error when URL is removed
+            retryCountRef.current = 0;
+            isRetryRef.current = false;
+            return;
+        }
+
+        // Reset retry state when handling a new URL to treat it as a fresh connection
+        isRetryRef.current = false;
+        retryCountRef.current = 0;
+
+        // Establish initial connection using the latest ref version
+        // Call via ref to avoid circular dependency issues
+        latestEstablishConnectionRef.current(isRetryRef.current);
+
+        return () => {
+            try {
+                streamAbortRef.current?.abort();
+            } catch (e) {
+                // ignore
+            }
+            // Clear connection token to prevent pending callbacks from executing
+            connectionTokenRef.current = null;
+            // Clean up any pending retry timeout
+            if (retryTimeoutRef.current) {
+                clearTimeout(retryTimeoutRef.current);
+                retryTimeoutRef.current = null;
+            }
+        };
+    }, [url, setConnectionError]);
     
     const renderMessageWithTokens = (message: string, tokenValues: { [key: string]: string }): string => {
-        Object.entries(tokenValues).forEach(([name, value]) => {
-            message = message.replace(`{${name}}`, value);
-        });
-        return message;
+        return replaceAllTokens(message, tokenValues);
     };
 
     const handleShowMessage = async (message: Message, tokenValues: { [key: string]: string }) => {
@@ -84,7 +268,6 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             setError(null); // Clear previous errors
             const formattedMessage = renderMessageWithTokens(message.message, tokenValues);
             setSuccess(t('message-list.success.message-shown-with-details', { message: formattedMessage })); // Set the success message
-            fetchMessages();
         } catch (error) {
             if (error instanceof Error) {
                 setError(t('message-list.errors.failed-to-show'));
@@ -103,7 +286,6 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             await clearMessage(url, message.id.uuid);
             setError(null);
             setSuccess(t('message-list.success.message-hidden', { message: message.message }));
-            fetchMessages();
         } catch (error) {
             if (error instanceof Error) {
                 setError(t('message-list.errors.failed-to-hide'));

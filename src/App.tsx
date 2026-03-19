@@ -125,7 +125,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
-        setError('');
+        setError(null);
       }, 3000); // Clear the error message after 3 seconds
       return () => clearTimeout(timer);
     }
