@@ -148,6 +148,41 @@ export const streamMessages = (
                 return null;
             };
 
+            // Helper to process an extracted JSON chunk
+            const processChunkBuffer = (
+                extracted: { json: string; rest: string } | null,
+                errorContext: string
+            ): { parsedData: Message | Message[] | undefined; rest: string } => {
+                let parsedData: Message | Message[] | undefined;
+                
+                if (!extracted) {
+                    return { parsedData: undefined, rest: '' };
+                }
+
+                try {
+                    const parsed = JSON.parse(extracted.json);
+                    const validation = validateMessage(parsed);
+                    if (validation.success && validation.data) {
+                        parsedData = validation.data;
+                    } else {
+                        console.error(`Invalid message format in ${errorContext}`, validation.error);
+                    }
+                } catch (err) {
+                    console.error(`Failed to parse ${errorContext}`, err);
+                }
+
+                // Call onChunk outside try/catch to handle callback errors separately
+                if (parsedData !== undefined) {
+                    try {
+                        onChunk(parsedData);
+                    } catch (err) {
+                        onError && onError(err);
+                    }
+                }
+
+                return { parsedData, rest: extracted.rest };
+            };
+
             const pump = async () => {
                 try {
                     while (true) {
@@ -159,27 +194,8 @@ export const streamMessages = (
                             // Drain the entire buffer using the same while-loop as streaming
                             let extracted = extractNextJson(buffer);
                             while (extracted) {
-                                let parsedData: Message | Message[] | undefined;
-                                try {
-                                    const parsed = JSON.parse(extracted.json);
-                                    const validation = validateMessage(parsed);
-                                    if (validation.success && validation.data) {
-                                        parsedData = validation.data;
-                                    } else {
-                                        console.error('Invalid message format in chunk', validation.error);
-                                    }
-                                } catch (err) {
-                                    console.error('Failed to parse chunk', err);
-                                }
-                                // Call onChunk outside try/catch to handle callback errors separately
-                                if (parsedData !== undefined) {
-                                    try {
-                                        onChunk(parsedData);
-                                    } catch (err) {
-                                        onError && onError(err);
-                                    }
-                                }
-                                buffer = extracted.rest;
+                                const { rest } = processChunkBuffer(extracted, 'chunk');
+                                buffer = rest;
                                 extracted = extractNextJson(buffer);
                             }
                             onClose && onClose();
@@ -190,27 +206,8 @@ export const streamMessages = (
 
                         let extracted = extractNextJson(buffer);
                         while (extracted) {
-                            let parsedData: Message | Message[] | undefined;
-                            try {
-                                const parsed = JSON.parse(extracted.json);
-                                const validation = validateMessage(parsed);
-                                if (validation.success && validation.data) {
-                                    parsedData = validation.data;
-                                } else {
-                                    console.error('Invalid message format in stream', validation.error);
-                                }
-                            } catch (err) {
-                                console.error('Failed to parse chunked JSON', err);
-                            }
-                            // Call onChunk outside try/catch to handle callback errors separately
-                            if (parsedData !== undefined) {
-                                try {
-                                    onChunk(parsedData);
-                                } catch (err) {
-                                    onError && onError(err);
-                                }
-                            }
-                            buffer = extracted.rest;
+                            const { rest } = processChunkBuffer(extracted, 'stream');
+                            buffer = rest;
                             extracted = extractNextJson(buffer);
                         }
                     }
