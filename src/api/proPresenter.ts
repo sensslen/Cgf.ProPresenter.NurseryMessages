@@ -22,6 +22,30 @@ const isAbortError = (err: unknown): boolean => {
     return false;
 };
 
+// Validate that parsed data conforms to Message shape
+const isValidMessage = (data: unknown): data is Message | Message[] => {
+    if (Array.isArray(data)) {
+        return data.every(item => isValidMessage(item));
+    }
+    
+    if (typeof data !== 'object' || data === null) {
+        return false;
+    }
+    
+    const obj = data as any;
+    
+    // Check required Message fields
+    if (!obj.id || typeof obj.id !== 'object') return false;
+    if (typeof obj.id.uuid !== 'string') return false;
+    if (typeof obj.id.index !== 'number') return false;
+    if (typeof obj.id.name !== 'string') return false;
+    if (typeof obj.message !== 'string') return false;
+    if (!Array.isArray(obj.tokens)) return false;
+    if (typeof obj.visible_on_network !== 'boolean') return false;
+    
+    return true;
+};
+
 // Stream messages using the chunked endpoint. Returns an AbortController to stop the stream.
 // The function returns the controller synchronously and runs the async connection logic in the background.
 export const streamMessages = (
@@ -38,6 +62,7 @@ export const streamMessages = (
         // Validate URL synchronously before starting async work
         if (!isValidUrl(url)) {
             onError && onError(new Error('Invalid URL format'));
+            onClose && onClose();
             return;
         }
 
@@ -117,7 +142,11 @@ export const streamMessages = (
                             while (extracted) {
                                 try {
                                     const parsed = JSON.parse(extracted.json);
-                                    onChunk(parsed as any);
+                                    if (isValidMessage(parsed)) {
+                                        onChunk(parsed);
+                                    } else {
+                                        console.error('Invalid message format in chunk', parsed);
+                                    }
                                 } catch (err) {
                                     console.error('Failed to parse chunk', err);
                                 }
@@ -134,7 +163,11 @@ export const streamMessages = (
                         while (extracted) {
                             try {
                                 const parsed = JSON.parse(extracted.json);
-                                onChunk(parsed as any);
+                                if (isValidMessage(parsed)) {
+                                    onChunk(parsed);
+                                } else {
+                                    console.error('Invalid message format in stream', parsed);
+                                }
                             } catch (err) {
                                 console.error('Failed to parse chunked JSON', err);
                             }
