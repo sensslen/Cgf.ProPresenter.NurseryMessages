@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { z } from 'zod';
 import { Message, TriggerPayload } from '../types/proPresenter';
 
@@ -238,9 +237,19 @@ export const streamMessages = (
 export const triggerMessage = async (url: string, id: string, payload: TriggerPayload): Promise<void> => {
     const resource = `${url}/v1/message/${id}/trigger`;
     try {
-        await axios.post(resource, payload);
+        const response = await fetch(resource, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            throw new StreamError(`Failed to trigger message: ${response.status}`, response.status);
+        }
     } catch (error) {
-        handleApiError(error);
+        if (error instanceof StreamError) {
+            throw error;
+        }
+        console.error('Error triggering message:', error);
         throw new Error(`Failed to trigger message at ${resource} with payload: ${JSON.stringify(payload)}`);
     }
 };
@@ -248,22 +257,15 @@ export const triggerMessage = async (url: string, id: string, payload: TriggerPa
 export const clearMessage = async (url: string, id: string): Promise<void> => {
     const resource = `${url}/v1/message/${id}/clear`;
     try {
-        await axios.get(resource);
-    } catch (error) {
-        handleApiError(error);
-        throw new Error(`Failed to clear message at ${resource}`);
-    }
-};
-
-const handleApiError = (error: unknown) => {
-    if (axios.isAxiosError(error)) {
-        // Handle Axios-specific errors
-        console.error('API Error:', error.message);
-        if (error.response) {
-            console.error('Response Data:', error.response.data);
+        const response = await fetch(resource, { method: 'GET' });
+        if (!response.ok) {
+            throw new StreamError(`Failed to clear message: ${response.status}`, response.status);
         }
-    } else {
-        // Handle other types of errors
-        console.error('Unexpected Error:', error);
+    } catch (error) {
+        if (error instanceof StreamError) {
+            throw error;
+        }
+        console.error('Error clearing message:', error);
+        throw new Error(`Failed to clear message at ${resource}`);
     }
 };
