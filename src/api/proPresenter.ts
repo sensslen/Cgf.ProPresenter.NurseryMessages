@@ -1,7 +1,57 @@
 import axios from 'axios';
+import Ajv from 'ajv';
 import { Message, TriggerPayload } from '../types/proPresenter';
 
-  const isValidUrl = (inputUrl: string): boolean => {
+const ajv = new Ajv();
+
+// JSON Schema for Message validation
+const messageSchema = {
+    oneOf: [
+        {
+            type: 'object',
+            properties: {
+                id: {
+                    type: 'object',
+                    properties: {
+                        uuid: { type: 'string' },
+                        index: { type: 'number' },
+                        name: { type: 'string' }
+                    },
+                    required: ['uuid', 'index', 'name']
+                },
+                message: { type: 'string' },
+                tokens: { type: 'array' },
+                visible_on_network: { type: 'boolean' }
+            },
+            required: ['id', 'message', 'tokens', 'visible_on_network']
+        },
+        {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    id: {
+                        type: 'object',
+                        properties: {
+                            uuid: { type: 'string' },
+                            index: { type: 'number' },
+                            name: { type: 'string' }
+                        },
+                        required: ['uuid', 'index', 'name']
+                    },
+                    message: { type: 'string' },
+                    tokens: { type: 'array' },
+                    visible_on_network: { type: 'boolean' }
+                },
+                required: ['id', 'message', 'tokens', 'visible_on_network']
+            }
+        }
+    ]
+};
+
+const validateMessage = ajv.compile(messageSchema);
+
+const isValidUrl = (inputUrl: string): boolean => {
     try {
       // Use URL constructor for basic format validation
       new URL(inputUrl);
@@ -20,30 +70,6 @@ const isAbortError = (err: unknown): boolean => {
         return true;
     }
     return false;
-};
-
-// Validate that parsed data conforms to Message shape
-const isValidMessage = (data: unknown): data is Message | Message[] => {
-    if (Array.isArray(data)) {
-        return data.every(item => isValidMessage(item));
-    }
-    
-    if (typeof data !== 'object' || data === null) {
-        return false;
-    }
-    
-    const obj = data as any;
-    
-    // Check required Message fields
-    if (!obj.id || typeof obj.id !== 'object') return false;
-    if (typeof obj.id.uuid !== 'string') return false;
-    if (typeof obj.id.index !== 'number') return false;
-    if (typeof obj.id.name !== 'string') return false;
-    if (typeof obj.message !== 'string') return false;
-    if (!Array.isArray(obj.tokens)) return false;
-    if (typeof obj.visible_on_network !== 'boolean') return false;
-    
-    return true;
 };
 
 // Stream messages using the chunked endpoint. Returns an AbortController to stop the stream.
@@ -142,10 +168,10 @@ export const streamMessages = (
                             while (extracted) {
                                 try {
                                     const parsed = JSON.parse(extracted.json);
-                                    if (isValidMessage(parsed)) {
-                                        onChunk(parsed);
+                                    if (validateMessage(parsed)) {
+                                        onChunk(parsed as unknown as Message | Message[]);
                                     } else {
-                                        console.error('Invalid message format in chunk', parsed);
+                                        console.error('Invalid message format in chunk', validateMessage.errors);
                                     }
                                 } catch (err) {
                                     console.error('Failed to parse chunk', err);
@@ -163,10 +189,10 @@ export const streamMessages = (
                         while (extracted) {
                             try {
                                 const parsed = JSON.parse(extracted.json);
-                                if (isValidMessage(parsed)) {
-                                    onChunk(parsed);
+                                if (validateMessage(parsed)) {
+                                    onChunk(parsed as unknown as Message | Message[]);
                                 } else {
-                                    console.error('Invalid message format in stream', parsed);
+                                    console.error('Invalid message format in stream', validateMessage.errors);
                                 }
                             } catch (err) {
                                 console.error('Failed to parse chunked JSON', err);
