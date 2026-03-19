@@ -46,7 +46,9 @@ export const streamMessages = (
         try {
             const response = await fetch(resource, { signal: controller.signal });
             if (!response.ok) {
-                throw new Error(`Failed to stream messages: ${response.status}`);
+                const error = new Error(`Failed to stream messages: ${response.status}`);
+                (error as any).statusCode = response.status;
+                throw error;
             }
 
             onOpen && onOpen();

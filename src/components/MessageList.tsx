@@ -144,12 +144,22 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             (err instanceof Error && err.message.includes('Invalid URL format')) ||
             (err instanceof Error && err.message.includes('validation'));
         
-        if (isValidationError) {
-            // Validation errors are deterministic - don't reconnect, wait for user correction
+        // Check if this is a terminal 4xx stream failure (deterministic, not transient)
+        let isTerminalError = false;
+        if (err instanceof Error) {
+            const statusCode = (err as any).statusCode;
+            // 4xx errors (client errors) are terminal - don't reconnect
+            if (statusCode && statusCode >= 400 && statusCode < 500) {
+                isTerminalError = true;
+            }
+        }
+        
+        if (isValidationError || isTerminalError) {
+            // Deterministic errors - don't reconnect, wait for user correction
             setConnectionError(t('message-list.errors.failed-to-connect'));
-            console.error('Validation error:', err);
+            console.error(isValidationError ? 'Validation error:' : 'Terminal error:', err);
         } else {
-            // All other errors are transient - set error and schedule reconnection with backoff
+            // All other errors are transient (including timeouts and 5xx) - set error and schedule reconnection with backoff
             setConnectionError(t('message-list.errors.failed-to-connect'));
             console.error('Streaming error:', err);
             latestAttemptReconnectRef.current(err);
