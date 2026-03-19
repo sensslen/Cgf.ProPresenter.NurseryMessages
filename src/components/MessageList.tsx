@@ -144,13 +144,23 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             (err instanceof Error && err.message.includes('Invalid URL format')) ||
             (err instanceof Error && err.message.includes('validation'));
         
-        // Check if this is a terminal 4xx stream failure (deterministic, not transient)
+        // Check if this is a terminal stream failure (deterministic, not transient)
         let isTerminalError = false;
         if (err instanceof Error) {
             const statusCode = (err as any).statusCode;
-            // 4xx errors (client errors) are terminal - don't reconnect
-            if (statusCode && statusCode >= 400 && statusCode < 500) {
-                isTerminalError = true;
+            if (statusCode) {
+                // Retryable errors (occur when remote is down/comes back):
+                // - 404: endpoint might come back
+                // - 408: request timeout (remote temporarily unavailable)
+                // - 429: rate limiting (transient)
+                // - 5xx: server errors (service temporarily down)
+                const isRetryable = (statusCode === 404 || statusCode === 408 || statusCode === 429) ||
+                                   (statusCode >= 500);
+                
+                // All other status codes (400-412, 413-427, 430-499) are terminal
+                if (!isRetryable) {
+                    isTerminalError = true;
+                }
             }
         }
         
@@ -159,7 +169,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             setConnectionError(t('message-list.errors.failed-to-connect'));
             console.error(isValidationError ? 'Validation error:' : 'Terminal error:', err);
         } else {
-            // All other errors are transient (including timeouts and 5xx) - set error and schedule reconnection with backoff
+            // All other errors are transient (timeouts, 404, 408, 429, 5xx) - set error and schedule reconnection with backoff
             setConnectionError(t('message-list.errors.failed-to-connect'));
             console.error('Streaming error:', err);
             latestAttemptReconnectRef.current(err);
