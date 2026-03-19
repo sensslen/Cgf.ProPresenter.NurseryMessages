@@ -16,47 +16,33 @@ export class StreamError extends Error {
 
 const ajv = new Ajv();
 
+// Reusable schema for Message object structure
+const messageObjectSchema = {
+    type: 'object',
+    properties: {
+        id: {
+            type: 'object',
+            properties: {
+                uuid: { type: 'string' },
+                index: { type: 'number' },
+                name: { type: 'string' }
+            },
+            required: ['uuid', 'index', 'name']
+        },
+        message: { type: 'string' },
+        tokens: { type: 'array' },
+        visible_on_network: { type: 'boolean' }
+    },
+    required: ['id', 'message', 'tokens', 'visible_on_network']
+};
+
 // JSON Schema for Message validation
 const messageSchema = {
     oneOf: [
-        {
-            type: 'object',
-            properties: {
-                id: {
-                    type: 'object',
-                    properties: {
-                        uuid: { type: 'string' },
-                        index: { type: 'number' },
-                        name: { type: 'string' }
-                    },
-                    required: ['uuid', 'index', 'name']
-                },
-                message: { type: 'string' },
-                tokens: { type: 'array' },
-                visible_on_network: { type: 'boolean' }
-            },
-            required: ['id', 'message', 'tokens', 'visible_on_network']
-        },
+        messageObjectSchema,
         {
             type: 'array',
-            items: {
-                type: 'object',
-                properties: {
-                    id: {
-                        type: 'object',
-                        properties: {
-                            uuid: { type: 'string' },
-                            index: { type: 'number' },
-                            name: { type: 'string' }
-                        },
-                        required: ['uuid', 'index', 'name']
-                    },
-                    message: { type: 'string' },
-                    tokens: { type: 'array' },
-                    visible_on_network: { type: 'boolean' }
-                },
-                required: ['id', 'message', 'tokens', 'visible_on_network']
-            }
+            items: messageObjectSchema
         }
     ]
 };
