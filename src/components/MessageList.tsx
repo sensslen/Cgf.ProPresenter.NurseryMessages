@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { streamMessages, triggerMessage, clearMessage } from '../api/proPresenter';
+import { streamMessages, triggerMessage, clearMessage, StreamError } from '../api/proPresenter';
 import { Message, TriggerPayloadToken } from '../types/proPresenter';
 import MessageItem from './MessageItem';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
     const [messages, setMessages] = useState<Message[]>([]);
     const { t } = useTranslation();
     const streamAbortRef = useRef<AbortController | null>(null);
+    const connectionTokenRef = useRef<{ id: number } | null>(null); // Token to identify active connection
     const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const retryCountRef = useRef(0);
     const isRetryRef = useRef(false); // Track if current connection attempt is a retry
@@ -73,37 +74,43 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             // Cancel any existing stream before starting a new one
             streamAbortRef.current?.abort();
             
+            // Create a token object to uniquely identify this connection attempt
+            // Assign it BEFORE calling streamMessages so that synchronous callbacks
+            // can identify the active connection
+            const connectionToken = { id: Math.random() };
+            connectionTokenRef.current = connectionToken;
+            
             // streamMessages is now synchronous and returns the controller immediately
             // The async connection logic runs in the background
-            // Capture the controller in a local const to scope callbacks to this exact instance
-            // This prevents old stream callbacks from invoking handlers for new streams
+            // Use the token in callbacks to scope callbacks to this exact instance
             const controller = streamMessages(
                 url,
                 (data) => {
-                    // Only process if this controller is still the active one
-                    if (streamAbortRef.current === controller) {
+                    // Only process if this is still the active connection
+                    if (connectionTokenRef.current === connectionToken) {
                         handleChunk(data);
                     }
                 },
                 () => {
-                    // Only process if this controller is still the active one
-                    if (streamAbortRef.current === controller) {
+                    // Only process if this is still the active connection
+                    if (connectionTokenRef.current === connectionToken) {
                         handleOpen();
                     }
                 },
                 () => {
-                    // Only process if this controller is still the active one
-                    if (streamAbortRef.current === controller) {
+                    // Only process if this is still the active connection
+                    if (connectionTokenRef.current === connectionToken) {
                         handleClose();
                     }
                 },
                 (err) => {
-                    // Only process if this controller is still the active one
-                    if (streamAbortRef.current === controller) {
+                    // Only process if this is still the active connection
+                    if (connectionTokenRef.current === connectionToken) {
                         latestHandleErrorRef.current(err);
                     }
                 }
             );
+            // Store the actual controller for cleanup/abort
             streamAbortRef.current = controller;
         } catch (err) {
             latestHandleErrorRef.current(err);
@@ -146,21 +153,27 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
         
         // Check if this is a terminal stream failure (deterministic, not transient)
         let isTerminalError = false;
-        if (err instanceof Error) {
-            const statusCode = (err as any).statusCode;
-            if (statusCode) {
-                // Retryable errors (occur when remote is down/comes back):
-                // - 404: endpoint might come back
-                // - 408: request timeout (remote temporarily unavailable)
-                // - 429: rate limiting (transient)
-                // - 5xx: server errors (service temporarily down)
-                const isRetryable = (statusCode === 404 || statusCode === 408 || statusCode === 429) ||
-                                   (statusCode >= 500);
-                
-                // All other status codes (400-412, 413-427, 430-499) are terminal
-                if (!isRetryable) {
-                    isTerminalError = true;
-                }
+        let statusCode: number | undefined;
+        
+        if (err instanceof StreamError) {
+            statusCode = err.statusCode;
+        } else if (err instanceof Error) {
+            // Fallback for any previously cast errors (defensive)
+            statusCode = (err as any).statusCode;
+        }
+        
+        if (statusCode) {
+            // Retryable errors (occur when remote is down/comes back):
+            // - 404: endpoint might come back
+            // - 408: request timeout (remote temporarily unavailable)
+            // - 429: rate limiting (transient)
+            // - 5xx: server errors (service temporarily down)
+            const isRetryable = (statusCode === 404 || statusCode === 408 || statusCode === 429) ||
+                               (statusCode >= 500);
+            
+            // All other status codes (400-412, 413-427, 430-499) are terminal
+            if (!isRetryable) {
+                isTerminalError = true;
             }
         }
         
@@ -208,6 +221,8 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             } catch (e) {
                 // ignore
             }
+            // Clear connection token to prevent pending callbacks from executing
+            connectionTokenRef.current = null;
             // Clean up any pending retry timeout
             if (retryTimeoutRef.current) {
                 clearTimeout(retryTimeoutRef.current);

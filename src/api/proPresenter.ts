@@ -2,6 +2,18 @@ import axios from 'axios';
 import Ajv from 'ajv';
 import { Message, TriggerPayload } from '../types/proPresenter';
 
+// Custom error class for stream failures with typed status code
+export class StreamError extends Error {
+    readonly statusCode: number;
+    readonly name = 'StreamError';
+
+    constructor(message: string, statusCode: number) {
+        super(message);
+        this.statusCode = statusCode;
+        Object.setPrototypeOf(this, StreamError.prototype);
+    }
+}
+
 const ajv = new Ajv();
 
 // JSON Schema for Message validation
@@ -87,8 +99,11 @@ export const streamMessages = (
     (async () => {
         // Validate URL synchronously before starting async work
         if (!isValidUrl(url)) {
-            onError && onError(new Error('Invalid URL format'));
-            onClose && onClose();
+            // Defer error/close callbacks to after controller is returned to caller
+            queueMicrotask(() => {
+                onError && onError(new Error('Invalid URL format'));
+                onClose && onClose();
+            });
             return;
         }
 
@@ -97,9 +112,7 @@ export const streamMessages = (
         try {
             const response = await fetch(resource, { signal: controller.signal });
             if (!response.ok) {
-                const error = new Error(`Failed to stream messages: ${response.status}`);
-                (error as any).statusCode = response.status;
-                throw error;
+                throw new StreamError(`Failed to stream messages: ${response.status}`, response.status);
             }
 
             onOpen && onOpen();
