@@ -45,13 +45,13 @@ const validateMessage = (data: unknown) => {
 
 const isValidUrl = (inputUrl: string): boolean => {
     try {
-      // Use URL constructor for basic format validation
-      new URL(inputUrl);
-      return true;
+        // Use URL constructor for basic format validation
+        new URL(inputUrl);
+        return true;
     } catch {
-      return false;
+        return false;
     }
-  };
+};
 
 // Detect if an error is an AbortError
 const isAbortError = (err: unknown): boolean => {
@@ -81,8 +81,8 @@ export const streamMessages = (
         if (!isValidUrl(url)) {
             // Defer error/close callbacks to after controller is returned to caller
             queueMicrotask(() => {
-                onError && onError(new Error('Invalid URL format'));
-                onClose && onClose();
+                onError?.(new Error('Invalid URL format'));
+                onClose?.();
             });
             return;
         }
@@ -95,7 +95,7 @@ export const streamMessages = (
                 throw new StreamError(`Failed to stream messages: ${response.status}`, response.status);
             }
 
-            onOpen && onOpen();
+            onOpen?.();
 
             const reader = response.body?.getReader();
             if (!reader) {
@@ -154,7 +154,7 @@ export const streamMessages = (
                 errorContext: string
             ): { parsedData: Message | Message[] | undefined; rest: string } => {
                 let parsedData: Message | Message[] | undefined;
-                
+
                 if (!extracted) {
                     return { parsedData: undefined, rest: '' };
                 }
@@ -176,7 +176,7 @@ export const streamMessages = (
                     try {
                         onChunk(parsedData);
                     } catch (err) {
-                        onError && onError(err);
+                        onError?.(err);
                     }
                 }
 
@@ -190,7 +190,7 @@ export const streamMessages = (
                         if (done) {
                             // Flush the TextDecoder to get any remaining bytes
                             buffer += decoder.decode();
-                            
+
                             // Drain the entire buffer using the same while-loop as streaming
                             let extracted = extractNextJson(buffer);
                             while (extracted) {
@@ -198,7 +198,7 @@ export const streamMessages = (
                                 buffer = rest;
                                 extracted = extractNextJson(buffer);
                             }
-                            onClose && onClose();
+                            onClose?.();
                             break;
                         }
 
@@ -214,7 +214,7 @@ export const streamMessages = (
                 } catch (err) {
                     // Only call onError if this is not an abort error (user/code explicitly cancelled)
                     if (!isAbortError(err)) {
-                        onError && onError(err);
+                        onError?.(err);
                     }
                 }
             };
@@ -224,7 +224,7 @@ export const streamMessages = (
         } catch (error) {
             // Only call onError if this is not an abort error (user/code explicitly cancelled)
             if (!isAbortError(error)) {
-                onError && onError(error);
+                onError?.(error);
             }
         }
     })();

@@ -22,9 +22,9 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
     const isRetryRef = useRef(false); // Track if current connection attempt is a retry
 
     // Refs to store the latest callback versions to break circular dependency
-    const latestHandleErrorRef = useRef<(err: unknown) => void>(() => {});
-    const latestAttemptReconnectRef = useRef<(errorArg: unknown) => void>(() => {});
-    const latestEstablishConnectionRef = useRef<(isRetry: boolean) => void>(() => {});
+    const latestHandleErrorRef = useRef<(err: unknown) => void>(() => { });
+    const latestAttemptReconnectRef = useRef<(errorArg: unknown) => void>(() => { });
+    const latestEstablishConnectionRef = useRef<(isRetry: boolean) => void>(() => { });
 
     // Memoized handlers to prevent stale closures
     const handleChunk = useCallback((data: Message[] | Message) => {
@@ -73,13 +73,13 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
         try {
             // Cancel any existing stream before starting a new one
             streamAbortRef.current?.abort();
-            
+
             // Create a token object to uniquely identify this connection attempt
             // Assign it BEFORE calling streamMessages so that synchronous callbacks
             // can identify the active connection
             const connectionToken = { id: Math.random() };
             connectionTokenRef.current = connectionToken;
-            
+
             // streamMessages is now synchronous and returns the controller immediately
             // The async connection logic runs in the background
             // Use the token in callbacks to scope callbacks to this exact instance
@@ -119,13 +119,13 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
 
     // Implement retry/backoff for transient failures
     // No dependency on establishConnection - calls via ref instead
-    const attemptReconnect = useCallback((_errorArg: unknown) => {
+    const attemptReconnect = useCallback(() => {
         // Clear any existing pending retry to prevent overlapping reconnection attempts
         if (retryTimeoutRef.current) {
             clearTimeout(retryTimeoutRef.current);
             retryTimeoutRef.current = null;
         }
-        
+
         // Calculate exponential backoff with jitter
         // Base delay: 1000ms, max delay: 30000ms
         const baseDelay = 1000;
@@ -147,21 +147,21 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
     // No dependency on attemptReconnect - calls via ref instead
     const handleError = useCallback((err: unknown) => {
         // Check if this is a validation error (deterministic, not transient)
-        const isValidationError = 
+        const isValidationError =
             (err instanceof Error && err.message.includes('Invalid URL format')) ||
             (err instanceof Error && err.message.includes('validation'));
-        
+
         // Check if this is a terminal stream failure (deterministic, not transient)
         let isTerminalError = false;
         let statusCode: number | undefined;
-        
+
         if (err instanceof StreamError) {
             statusCode = err.statusCode;
         } else if (err instanceof Error) {
             // Fallback for any previously cast errors (defensive)
-            statusCode = (err as any).statusCode;
+            statusCode = (err as { statusCode?: number }).statusCode;
         }
-        
+
         if (statusCode) {
             // Retryable errors (occur when remote is down/comes back):
             // - 404: endpoint might come back
@@ -169,14 +169,14 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             // - 429: rate limiting (transient)
             // - 5xx: server errors (service temporarily down)
             const isRetryable = (statusCode === 404 || statusCode === 408 || statusCode === 429) ||
-                               (statusCode >= 500);
-            
+                (statusCode >= 500);
+
             // All other status codes (400-412, 413-427, 430-499) are terminal
             if (!isRetryable) {
                 isTerminalError = true;
             }
         }
-        
+
         if (isValidationError || isTerminalError) {
             // Deterministic errors - don't reconnect, wait for user correction
             setConnectionError(t('message-list.errors.failed-to-connect'));
@@ -199,14 +199,6 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
 
     // Stream messages from the server using the chunked endpoint
     useEffect(() => {
-        if (!url) {
-            setMessages([]);
-            setConnectionError(null); // Clear error when URL is removed
-            retryCountRef.current = 0;
-            isRetryRef.current = false;
-            return;
-        }
-
         // Reset retry state when handling a new URL to treat it as a fresh connection
         isRetryRef.current = false;
         retryCountRef.current = 0;
@@ -218,7 +210,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
         return () => {
             try {
                 streamAbortRef.current?.abort();
-            } catch (e) {
+            } catch {
                 // ignore
             }
             // Clear connection token to prevent pending callbacks from executing
@@ -230,7 +222,7 @@ const MessageList: React.FC<MessageListProps> = ({ url, setError, setConnectionE
             }
         };
     }, [url, setConnectionError]);
-    
+
     const renderMessageWithTokens = (message: string, tokenValues: { [key: string]: string }): string => {
         return replaceAllTokens(message, tokenValues);
     };
