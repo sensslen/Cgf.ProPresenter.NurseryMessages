@@ -98,8 +98,14 @@ const App: React.FC = () => {
 
   const handleUrlChange = (newUrl: string) => {
     setUrl(newUrl);
+
+    setConnectionError(null);
+    if (!newUrl) {
+      setError(null);
+      setSuccess(null);
+    }
+
     // Update the URL in the address bar without reloading
-    // Encode the URL in Base64 for better security and readability
     if (newUrl) {
       const encodedUrl = encodeUrlToBase64(newUrl);
       window.history.pushState(null, '', `?${URL_PARAM_KEY}=${encodedUrl}`);
