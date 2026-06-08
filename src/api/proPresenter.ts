@@ -24,7 +24,8 @@ const messageObjectSchema = z.object({
     id: messageIdSchema,
     message: z.string(),
     tokens: z.array(z.any()), // tokens have complex optional structure, validate as array of any
-    visible_on_network: z.boolean()
+    visible_on_network: z.boolean(),
+    is_active: z.boolean().optional()
 });
 
 // Accept either a single message or an array of messages
