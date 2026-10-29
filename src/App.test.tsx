@@ -21,6 +21,39 @@ afterEach(() => {
 });
 
 describe('operator workflow', () => {
+    it('preserves the typed address across pauses so a proxy path can be continued', async () => {
+        const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 403 }));
+        vi.stubGlobal('fetch', fetch);
+        render(<App />);
+        const input = screen.getByLabelText<HTMLInputElement>('Enter connection to ProPresenter');
+        fireEvent.change(input, { target: { value: 'http://HOST:1025/' } });
+        await act(async () => vi.advanceTimersByTimeAsync(500));
+        expect(input.value).toBe('http://HOST:1025/');
+        expect(fetch).toHaveBeenLastCalledWith('http://host:1025/v1/messages?chunked=true', expect.anything());
+        fireEvent.change(input, { target: { value: `${input.value}proxy/` } });
+        await act(async () => vi.advanceTimersByTimeAsync(500));
+        expect(input.value).toBe('http://HOST:1025/proxy/');
+        expect(fetch).toHaveBeenLastCalledWith('http://host:1025/proxy/v1/messages?chunked=true', expect.anything());
+        expect(new URLSearchParams(window.location.search).get('url')).toBe(encodeUrlToBase64('http://host:1025/proxy'));
+    });
+
+    it('keeps the connection status and bookmark unchanged for equivalent address edits', async () => {
+        window.history.replaceState(null, '', `?url=${encodeUrlToBase64('http://host:1025')}`);
+        const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 403 }));
+        vi.stubGlobal('fetch', fetch);
+        await act(async () => { render(<App />); });
+        const replaceState = vi.spyOn(window.history, 'replaceState');
+        const status = screen.getByRole('alert').textContent;
+        const input = screen.getByLabelText<HTMLInputElement>('Enter connection to ProPresenter');
+        fireEvent.change(input, { target: { value: 'http://HOST:1025/' } });
+        expect(screen.getByRole('alert').textContent).toBe(status);
+        expect(screen.getByRole('button', { name: 'Retry' })).toBeDefined();
+        await act(async () => vi.advanceTimersByTimeAsync(500));
+        expect(input.value).toBe('http://HOST:1025/');
+        expect(fetch).toHaveBeenCalledOnce();
+        expect(replaceState).not.toHaveBeenCalled();
+    });
+
     it('connects automatically after typing pauses without adding history entries', async () => {
         const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 403 }));
         vi.stubGlobal('fetch', fetch);

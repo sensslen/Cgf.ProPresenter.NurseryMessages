@@ -65,7 +65,7 @@ Run `npm run lint`, `npm test`, and `npm run build` before submitting changes. P
 
 The browser connects directly to ProPresenter; no application backend or global state store is required. The API module validates responses and yields messages from an abortable async stream. `useMessages` owns connection lifetime, reconnection, and server state. Message editors own text drafts and keep them across stream updates; switching connections resets them. Show/hide requests have a 15-second timeout and are cancelled when their connection is removed.
 
-Malformed payloads stop the connection and produce a visible error instead of silently preserving stale data. Each JSON message or message list is limited to 1,048,576 decoded characters. Transient transport failures retry with jitter up to a 30-second delay. Click Retry after correcting a terminal server or protocol error. Address edits update the bookmarkable URL without creating browser-history entries.
+Malformed payloads stop the connection and produce a visible error instead of silently preserving stale data. Each JSON message or message list is limited to 1,048,576 UTF-16 code units in the decoded JSON source, before JSON parsing. Transient transport failures retry with jitter up to a 30-second delay. Click Retry after correcting a terminal server or protocol error. Address edits update the bookmarkable URL without creating browser-history entries.
 
 Token validation checks names and editable text. Timer, clock, and other ProPresenter-owned configuration passes through unchanged, including fields not described by the [published API schema](https://openapi.propresenter.com/). This avoids rejecting new token layouts or dropping metadata.
 

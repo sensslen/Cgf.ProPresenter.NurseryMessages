@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MessageList from './components/MessageList';
 import type { Notification } from './components/MessageList';
 import ConnectionStatus from './components/ConnectionStatus';
 import { APP_VERSION } from './utils/version';
-import { normalizeConnectionUrl, readConnectionUrl, writeConnectionUrl } from './utils/urlEncoding';
+import { InvalidConnectionUrlError, normalizeConnectionUrl, readConnectionUrl, writeConnectionUrl } from './utils/urlEncoding';
 
 export default function App() {
   const [url, setUrl] = useState(() => readConnectionUrl(window.location.search));
@@ -12,24 +12,31 @@ export default function App() {
   const [invalidUrl, setInvalidUrl] = useState(false);
   const [notification, setNotification] = useState<Notification | null>(null);
   const { t } = useTranslation();
+  const draftAddress = useMemo(() => {
+    try {
+      return { url: normalizeConnectionUrl(draftUrl), error: null };
+    } catch (error) {
+      if (!(error instanceof InvalidConnectionUrlError)) throw error;
+      return { url: null, error };
+    }
+  }, [draftUrl]);
+  const editingAddress = Boolean(draftUrl.trim()) && draftAddress.url !== url;
 
   useEffect(() => {
-    if (!draftUrl.trim() || draftUrl === url) return;
+    if (!editingAddress) return;
     const timer = setTimeout(() => {
-      try {
-        const nextUrl = normalizeConnectionUrl(draftUrl);
-        writeConnectionUrl(nextUrl);
-        setUrl(nextUrl);
-        setDraftUrl(nextUrl);
-        setInvalidUrl(false);
-        setNotification(null);
-      } catch (error) {
-        console.error('Invalid connection address:', error);
+      if (draftAddress.url === null) {
+        console.error('Invalid connection address:', draftAddress.error);
         setInvalidUrl(true);
+        return;
       }
+      writeConnectionUrl(draftAddress.url);
+      setUrl(draftAddress.url);
+      setInvalidUrl(false);
+      setNotification(null);
     }, 500);
     return () => clearTimeout(timer);
-  }, [draftUrl, url]);
+  }, [draftAddress, editingAddress]);
 
   useEffect(() => {
     if (notification?.kind !== 'success') return;
@@ -71,13 +78,13 @@ export default function App() {
               key={url}
               url={url}
               notify={setNotification}
-              editingAddress={Boolean(draftUrl.trim()) && draftUrl !== url}
+              editingAddress={editingAddress}
               invalidAddress={invalidUrl}
             />
           ) : (
             <ConnectionStatus
               status="empty"
-              editingAddress={Boolean(draftUrl.trim())}
+              editingAddress={editingAddress}
               invalidAddress={invalidUrl}
             />
           )}
