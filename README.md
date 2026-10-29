@@ -9,6 +9,7 @@ This application provides a simple and effective way to display nursery messages
 * **Fill in Message Tokens**: If a message contains tokens (e.g., for a child's name or number), you can easily fill them in before displaying the message.
 * **Real-time Updates**: Messages update through ProPresenter's chunked stream. Lost connections reconnect automatically with backoff; the connection status warns when displayed messages may be stale.
 * **Localized Interface**: The user interface is available in multiple languages including English, German, Spanish, French, Portuguese, Korean, Norwegian, Czech, Simplified Chinese, Russian, Hindi, Arabic, and Bengali. The application automatically detects your browser's language.
+* **Responsive Design**: A single message sheet adapts to phones and tablets, follows the system light/dark setting, and supports right-to-left layouts. Connection status stays visible while scrolling. The version footer and action notifications have their own space, so they never cover message controls.
 
 ## How to Use
 
@@ -20,6 +21,8 @@ This section is for end-users who will be operating the application.
 4.  For any message, **fill in text token values** in the provided input fields. Timer and clock tokens retain their configuration from ProPresenter.
 5.  Click the **"Show"** button to trigger the message in ProPresenter.
 6.  Click **"Hide"** to clear an active message. You can bookmark or share the connected page's URL to restore the connection later. Older connection links remain supported.
+
+An **"On screen"** label reflects ProPresenter's reported message state. **Message preview** shows your current draft, which may differ from the text last sent to the screen. Editing an address leaves the previous connection running until a valid replacement is ready; the status explains which connection is still active.
 
 The browser must be able to reach ProPresenter's network API. `localhost` refers to the device running the browser, not a different presentation computer. For another computer, use its LAN address and configured API port.
 

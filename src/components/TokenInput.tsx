@@ -10,14 +10,14 @@ interface TokenInputProps {
 export default function TokenInput({ token, tokenValue, setTokenValue }: TokenInputProps) {
     const id = useId();
     return (
-        <div className="my-2">
-            <label htmlFor={id} className="block">{token.name}</label>
+        <div className="token-field">
+            <label htmlFor={id} dir="auto">{token.name}</label>
             <input
                 id={id}
                 type="text"
+                dir="auto"
                 value={tokenValue}
                 onChange={event => setTokenValue(event.target.value)}
-                className="border p-2 w-full"
             />
         </div>
     );

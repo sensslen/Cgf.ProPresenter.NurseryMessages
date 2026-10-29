@@ -1,5 +1,10 @@
 {
   "app": {
+    "title": "Meldinger fra barnepass",
+    "connectHint": "Skriv inn en adresse for å laste inn meldingene dine.",
+    "editingAddress": "Adressen endres.",
+    "previousConnection": "Den forrige tilkoblingen er fortsatt aktiv.",
+    "dismissNotification": "Lukk varsel",
     "invalidUrl": "Skriv inn en HTTP- eller HTTPS-serveradresse uten påloggingsinformasjon, spørring eller fragment.",
     "loading": "Laster...",
     "enterProPresenterUrl": "Skriv inn tilkobling til ProPresenter"
@@ -24,7 +29,8 @@
   },
   "message-item": {
     "managed-token": "Konfigurert i ProPresenter",
-    "formatted-message": "<0>Formatert melding:</0> <1>{{message}}</1>",
+    "preview": "Forhåndsvisning av melding",
+    "on-screen": "På skjermen",
     "show": "Vis",
     "show-again": "Vis igjen",
     "hide": "Skjul"

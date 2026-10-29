@@ -1,5 +1,10 @@
 {
   "app": {
+    "title": "Mensajes de la guardería",
+    "connectHint": "Introduce una dirección para cargar tus mensajes.",
+    "editingAddress": "La dirección está cambiando.",
+    "previousConnection": "La conexión anterior sigue activa.",
+    "dismissNotification": "Cerrar notificación",
     "invalidUrl": "Ingrese una dirección de servidor HTTP o HTTPS sin credenciales, consulta ni fragmento.",
     "loading": "Cargando...",
     "enterProPresenterUrl": "Ingrese la conexión a ProPresenter"
@@ -24,7 +29,8 @@
   },
   "message-item": {
     "managed-token": "Configurado en ProPresenter",
-    "formatted-message": "<0>Mensaje formateado:</0> <1>{{message}}</1>",
+    "preview": "Vista previa del mensaje",
+    "on-screen": "En pantalla",
     "show": "Mostrar",
     "show-again": "Mostrar de nuevo",
     "hide": "Ocultar"

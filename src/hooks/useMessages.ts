@@ -3,7 +3,7 @@ import { clearMessage, createTriggerPayload, streamMessages, StreamError, Stream
 import type { Message } from '../types/proPresenter';
 import { InvalidConnectionUrlError } from '../utils/urlEncoding';
 
-type ConnectionStatus = 'connecting' | 'connected' | 'reconnecting' | 'failed';
+export type ConnectionStatus = 'connecting' | 'connected' | 'reconnecting' | 'failed';
 interface ConnectionState {
     url: string;
     messages: Message[];
@@ -85,9 +85,10 @@ export function useMessages(url: string) {
         await clearMessage(url, message.id.uuid, currentSignal());
     }
 
+    const status: ConnectionStatus = state.url === url ? state.status : 'connecting';
     return {
         messages: state.url === url ? state.messages : [],
-        status: state.url === url ? state.status : 'connecting',
+        status,
         showMessage,
         hideMessage,
         retry,

@@ -1,5 +1,10 @@
 {
   "app": {
+    "title": "Zprávy z dětského koutku",
+    "connectHint": "Zadejte adresu pro načtení zpráv.",
+    "editingAddress": "Adresa se mění.",
+    "previousConnection": "Předchozí připojení je stále aktivní.",
+    "dismissNotification": "Zavřít oznámení",
     "invalidUrl": "Zadejte adresu serveru HTTP nebo HTTPS bez přihlašovacích údajů, dotazu nebo fragmentu.",
     "loading": "Načítání...",
     "enterProPresenterUrl": "Zadejte připojení k ProPresenter"
@@ -24,7 +29,8 @@
   },
   "message-item": {
     "managed-token": "Nastaveno v ProPresenter",
-    "formatted-message": "<0>Formátovaná zpráva:</0> <1>{{message}}</1>",
+    "preview": "Náhled zprávy",
+    "on-screen": "Na obrazovce",
     "show": "Zobrazit",
     "show-again": "Zobrazit znovu",
     "hide": "Skrýt"

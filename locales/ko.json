@@ -1,5 +1,10 @@
 {
   "app": {
+    "title": "영유아실 메시지",
+    "connectHint": "메시지를 불러오려면 주소를 입력하세요.",
+    "editingAddress": "주소를 변경하는 중입니다.",
+    "previousConnection": "이전 연결이 아직 활성 상태입니다.",
+    "dismissNotification": "알림 닫기",
     "invalidUrl": "인증 정보, 쿼리 또는 프래그먼트가 없는 HTTP 또는 HTTPS 서버 주소를 입력하세요.",
     "loading": "로딩 중...",
     "enterProPresenterUrl": "ProPresenter 연결 입력"
@@ -24,7 +29,8 @@
   },
   "message-item": {
     "managed-token": "ProPresenter에서 설정됨",
-    "formatted-message": "<0>서식이 지정된 메시지:</0> <1>{{message}}</1>",
+    "preview": "메시지 미리보기",
+    "on-screen": "화면에 표시 중",
     "show": "표시",
     "show-again": "다시 표시",
     "hide": "숨기기"

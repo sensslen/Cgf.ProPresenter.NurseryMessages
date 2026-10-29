@@ -1,5 +1,10 @@
 {
   "app": {
+    "title": "Nachrichten aus der Kinderbetreuung",
+    "connectHint": "Geben Sie eine Adresse ein, um Ihre Nachrichten zu laden.",
+    "editingAddress": "Adresse wird geändert.",
+    "previousConnection": "Die bisherige Verbindung ist weiterhin aktiv.",
+    "dismissNotification": "Benachrichtigung schließen",
     "invalidUrl": "Geben Sie eine HTTP- oder HTTPS-Serveradresse ohne Zugangsdaten, Abfrage oder Fragment ein.",
     "loading": "Lade...",
     "enterProPresenterUrl": "Verbindung zu ProPresenter eingeben"
@@ -24,7 +29,8 @@
   },
   "message-item": {
     "managed-token": "In ProPresenter konfiguriert",
-    "formatted-message": "<0>Formatierte Nachricht:</0> <1>{{message}}</1>",
+    "preview": "Nachrichtenvorschau",
+    "on-screen": "Wird angezeigt",
     "show": "Anzeigen",
     "show-again": "Erneut anzeigen",
     "hide": "Ausblenden"

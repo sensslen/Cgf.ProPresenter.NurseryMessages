@@ -1,5 +1,10 @@
 {
   "app": {
+    "title": "Mensagens do berçário",
+    "connectHint": "Introduza um endereço para carregar as suas mensagens.",
+    "editingAddress": "O endereço está a ser alterado.",
+    "previousConnection": "A ligação anterior continua ativa.",
+    "dismissNotification": "Fechar notificação",
     "invalidUrl": "Digite um endereço de servidor HTTP ou HTTPS sem credenciais, consulta ou fragmento.",
     "loading": "Carregando...",
     "enterProPresenterUrl": "Digite a conexão com o ProPresenter"
@@ -24,7 +29,8 @@
   },
   "message-item": {
     "managed-token": "Configurado no ProPresenter",
-    "formatted-message": "<0>Mensagem formatada:</0> <1>{{message}}</1>",
+    "preview": "Pré-visualização da mensagem",
+    "on-screen": "No ecrã",
     "show": "Exibir",
     "show-again": "Exibir novamente",
     "hide": "Ocultar"

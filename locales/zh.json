@@ -1,5 +1,10 @@
 {
   "app": {
+    "title": "托儿室消息",
+    "connectHint": "输入地址以加载消息。",
+    "editingAddress": "正在更改地址。",
+    "previousConnection": "之前的连接仍然有效。",
+    "dismissNotification": "关闭通知",
     "invalidUrl": "请输入不含凭据、查询参数或片段的 HTTP 或 HTTPS 服务器地址。",
     "loading": "加载中...",
     "enterProPresenterUrl": "输入连接到ProPresenter"
@@ -24,7 +29,8 @@
   },
   "message-item": {
     "managed-token": "在 ProPresenter 中配置",
-    "formatted-message": "<0>格式化消息：</0> <1>{{message}}</1>",
+    "preview": "消息预览",
+    "on-screen": "正在显示",
     "show": "显示",
     "show-again": "再次显示",
     "hide": "隐藏"

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MessageList from './components/MessageList';
 import type { Notification } from './components/MessageList';
+import ConnectionStatus from './components/ConnectionStatus';
 import { APP_VERSION } from './utils/version';
 import { normalizeConnectionUrl, readConnectionUrl, writeConnectionUrl } from './utils/urlEncoding';
 
@@ -19,6 +20,7 @@ export default function App() {
         const nextUrl = normalizeConnectionUrl(draftUrl);
         writeConnectionUrl(nextUrl);
         setUrl(nextUrl);
+        setDraftUrl(nextUrl);
         setInvalidUrl(false);
         setNotification(null);
       } catch (error) {
@@ -46,31 +48,56 @@ export default function App() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl min-h-screen p-4 pb-12">
+    <div className="app-shell">
+      <main className="app-scroll">
+        <div className="app-content">
+          <h1>{t('app.title')}</h1>
+          <div className="connection-field">
+            <label htmlFor="connection-url">{t('app.enterProPresenterUrl')}</label>
+            <input
+              id="connection-url"
+              type="url"
+              dir="ltr"
+              value={draftUrl}
+              onChange={event => changeAddress(event.target.value)}
+              aria-invalid={invalidUrl}
+              aria-describedby="connection-status"
+              placeholder="http://localhost:1025"
+              className="connection-address"
+            />
+          </div>
+          {url ? (
+            <MessageList
+              key={url}
+              url={url}
+              notify={setNotification}
+              editingAddress={Boolean(draftUrl.trim()) && draftUrl !== url}
+              invalidAddress={invalidUrl}
+            />
+          ) : (
+            <ConnectionStatus
+              status="empty"
+              editingAddress={Boolean(draftUrl.trim())}
+              invalidAddress={invalidUrl}
+            />
+          )}
+        </div>
+      </main>
       {notification && (
-        <div
-          role={notification.kind === 'error' ? 'alert' : 'status'}
-          className={`mb-4 rounded p-3 text-white ${notification.kind === 'error' ? 'bg-red-700' : 'bg-green-700'}`}
-        >
-          {t(notification.key, notification.values)}
+        <div className="notification-dock">
+          <div className="notification" data-kind={notification.kind}>
+            <p role={notification.kind === 'error' ? 'alert' : 'status'}>
+              {t(notification.key, notification.values)}
+            </p>
+            <button type="button" className="dismiss-button" aria-label={t('app.dismissNotification')} onClick={() => setNotification(null)}>
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="m4 4 8 8m0-8-8 8" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+            </button>
+          </div>
         </div>
       )}
-      <div className="mb-4">
-        <label htmlFor="connection-url" className="block mb-1">{t('app.enterProPresenterUrl')}</label>
-        <input
-          id="connection-url"
-          type="url"
-          value={draftUrl}
-          onChange={event => changeAddress(event.target.value)}
-          aria-invalid={invalidUrl}
-          aria-describedby={invalidUrl ? 'invalid-url' : undefined}
-          placeholder="http://localhost:1025"
-          className="border p-2 w-full"
-        />
-        {invalidUrl && <p id="invalid-url" role="alert" className="text-red-700 mt-2">{t('app.invalidUrl')}</p>}
-      </div>
-      {url && <MessageList key={url} url={url} notify={setNotification} />}
-      <footer className="fixed bottom-0 left-0 w-full bg-white text-gray-600 text-center text-xs p-2">
+      <footer className="app-footer">
         {t('footer.version', { version: APP_VERSION })}
       </footer>
     </div>

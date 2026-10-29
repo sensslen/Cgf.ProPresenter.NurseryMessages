@@ -1,5 +1,10 @@
 {
   "app": {
+    "title": "শিশুযত্নের বার্তা",
+    "connectHint": "আপনার বার্তা লোড করতে একটি ঠিকানা লিখুন।",
+    "editingAddress": "ঠিকানা পরিবর্তন হচ্ছে।",
+    "previousConnection": "আগের সংযোগ এখনও সক্রিয়।",
+    "dismissNotification": "বিজ্ঞপ্তি বন্ধ করুন",
     "invalidUrl": "পরিচয়পত্র, কোয়েরি বা ফ্র্যাগমেন্ট ছাড়া একটি HTTP বা HTTPS সার্ভারের ঠিকানা লিখুন।",
     "loading": "লোড হচ্ছে...",
     "enterProPresenterUrl": "ProPresenter এর সাথে সংযোগ লিখুন"
@@ -24,7 +29,8 @@
   },
   "message-item": {
     "managed-token": "ProPresenter-এ কনফিগার করা হয়েছে",
-    "formatted-message": "<0>বিন্যাসিত বার্তা:</0> <1>{{message}}</1>",
+    "preview": "বার্তার পূর্বরূপ",
+    "on-screen": "পর্দায় দেখানো হচ্ছে",
     "show": "প্রদর্শন করুন",
     "show-again": "আবার প্রদর্শন করুন",
     "hide": "লুকান"

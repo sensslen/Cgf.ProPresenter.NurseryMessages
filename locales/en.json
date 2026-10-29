@@ -1,5 +1,10 @@
 {
   "app": {
+    "title": "Nursery messages",
+    "connectHint": "Enter an address to load your messages.",
+    "editingAddress": "Address changing.",
+    "previousConnection": "Previous connection still active.",
+    "dismissNotification": "Dismiss notification",
     "invalidUrl": "Enter an HTTP or HTTPS server address without credentials, query, or fragment.",
     "loading": "Loading...",
     "enterProPresenterUrl": "Enter connection to ProPresenter"
@@ -24,7 +29,8 @@
   },
   "message-item": {
     "managed-token": "Configured in ProPresenter",
-    "formatted-message": "<0>Formatted message:</0> <1>{{message}}</1>",
+    "preview": "Message preview",
+    "on-screen": "On screen",
     "show": "Show",
     "show-again": "Show again",
     "hide": "Hide"
