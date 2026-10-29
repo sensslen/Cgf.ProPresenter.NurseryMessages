@@ -1,12 +1,11 @@
 {
   "app": {
-    "connect": "Connect",
-    "disconnect": "Disconnect",
     "invalidUrl": "Enter an HTTP or HTTPS server address without credentials, query, or fragment.",
     "loading": "Loading...",
     "enterProPresenterUrl": "Enter connection to ProPresenter"
   },
   "message-list": {
+    "retry": "Retry",
     "connecting": "Connecting to ProPresenter...",
     "connected": "Connected to ProPresenter.",
     "reconnecting": "Connection lost. Reconnecting... Displayed messages may be outdated.",

@@ -1,12 +1,11 @@
 {
   "app": {
-    "connect": "Koble til",
-    "disconnect": "Koble fra",
     "invalidUrl": "Skriv inn en HTTP- eller HTTPS-serveradresse uten påloggingsinformasjon, spørring eller fragment.",
     "loading": "Laster...",
     "enterProPresenterUrl": "Skriv inn tilkobling til ProPresenter"
   },
   "message-list": {
+    "retry": "Prøv igjen",
     "connecting": "Kobler til ProPresenter...",
     "connected": "Koblet til ProPresenter.",
     "reconnecting": "Tilkoblingen ble brutt. Kobler til på nytt... Viste meldinger kan være utdaterte.",

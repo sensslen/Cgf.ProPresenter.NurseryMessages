@@ -15,7 +15,10 @@ export default function MessageItem({ message, onShowMessage, onHideMessage }: M
     const [drafts, setDrafts] = useState<Record<string, string>>({});
     const [pending, setPending] = useState(false);
     const tokenValues = Object.fromEntries(
-        message.tokens.filter(token => token.text).map(token => [token.name, drafts[token.name] ?? '']),
+        message.tokens.filter(token => token.text).map(token => [
+            token.name,
+            Object.prototype.hasOwnProperty.call(drafts, token.name) ? drafts[token.name] : '',
+        ]),
     );
 
     async function submit(action: () => Promise<void>) {

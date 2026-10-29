@@ -1,12 +1,11 @@
 {
   "app": {
-    "connect": "Connecter",
-    "disconnect": "Déconnecter",
     "invalidUrl": "Saisissez une adresse de serveur HTTP ou HTTPS sans identifiants, paramètres de requête ni fragment.",
     "loading": "Chargement...",
     "enterProPresenterUrl": "Entrer la connexion à ProPresenter"
   },
   "message-list": {
+    "retry": "Réessayer",
     "connecting": "Connexion à ProPresenter...",
     "connected": "Connecté à ProPresenter.",
     "reconnecting": "Connexion perdue. Reconnexion... Les messages affichés peuvent être obsolètes.",

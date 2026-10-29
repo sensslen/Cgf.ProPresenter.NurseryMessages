@@ -134,6 +134,11 @@ describe('message streaming', () => {
 });
 
 describe('message actions', () => {
+    it.each(['constructor', 'toString', '__proto__'])('defaults unedited %s tokens to empty text', name => {
+        const data = { ...message, tokens: [{ name, text: { text: 'original' } }] };
+        expect(createTriggerPayload(data, {})).toEqual([{ name, text: { text: '' } }]);
+        expect(createTriggerPayload(data, { [name]: '42' })).toEqual([{ name, text: { text: '42' } }]);
+    });
     it('substitutes text values and preserves timer and clock configuration', () => {
         const original = { ...message, tokens: [...message.tokens, timer, clock] };
         const payload = createTriggerPayload(original, { Child: '$& {Clock}', Timer: 'ignored', Clock: 'ignored' });

@@ -1,12 +1,11 @@
 {
   "app": {
-    "connect": "اتصال",
-    "disconnect": "قطع الاتصال",
     "invalidUrl": "أدخل عنوان خادم HTTP أو HTTPS بدون بيانات اعتماد أو استعلام أو جزء مرجعي.",
     "loading": "جاري التحميل...",
     "enterProPresenterUrl": "أدخل الاتصال بـ ProPresenter"
   },
   "message-list": {
+    "retry": "إعادة المحاولة",
     "connecting": "جارٍ الاتصال بـ ProPresenter...",
     "connected": "متصل بـ ProPresenter.",
     "reconnecting": "انقطع الاتصال. جارٍ إعادة الاتصال... قد تكون الرسائل المعروضة قديمة.",

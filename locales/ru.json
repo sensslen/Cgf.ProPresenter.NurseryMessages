@@ -1,12 +1,11 @@
 {
   "app": {
-    "connect": "Подключить",
-    "disconnect": "Отключить",
     "invalidUrl": "Введите адрес сервера HTTP или HTTPS без учётных данных, строки запроса или фрагмента.",
     "loading": "Загрузка...",
     "enterProPresenterUrl": "Введите подключение к ProPresenter"
   },
   "message-list": {
+    "retry": "Повторить",
     "connecting": "Подключение к ProPresenter...",
     "connected": "Подключено к ProPresenter.",
     "reconnecting": "Соединение потеряно. Повторное подключение... Отображаемые сообщения могут быть устаревшими.",

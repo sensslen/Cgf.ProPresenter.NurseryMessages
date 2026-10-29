@@ -1,12 +1,11 @@
 {
   "app": {
-    "connect": "সংযোগ করুন",
-    "disconnect": "সংযোগ বিচ্ছিন্ন করুন",
     "invalidUrl": "পরিচয়পত্র, কোয়েরি বা ফ্র্যাগমেন্ট ছাড়া একটি HTTP বা HTTPS সার্ভারের ঠিকানা লিখুন।",
     "loading": "লোড হচ্ছে...",
     "enterProPresenterUrl": "ProPresenter এর সাথে সংযোগ লিখুন"
   },
   "message-list": {
+    "retry": "আবার চেষ্টা করুন",
     "connecting": "ProPresenter-এর সাথে সংযোগ করা হচ্ছে...",
     "connected": "ProPresenter-এর সাথে সংযুক্ত।",
     "reconnecting": "সংযোগ বিচ্ছিন্ন হয়েছে। পুনরায় সংযোগ করা হচ্ছে... প্রদর্শিত বার্তাগুলি পুরোনো হতে পারে।",

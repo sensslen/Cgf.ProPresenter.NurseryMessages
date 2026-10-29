@@ -16,7 +16,7 @@ interface MessageListProps {
 }
 
 export default function MessageList({ url, notify }: MessageListProps) {
-    const { messages, status, showMessage, hideMessage } = useMessages(url);
+    const { messages, status, showMessage, hideMessage, retry } = useMessages(url);
     const { t } = useTranslation();
 
     async function show(message: Message, values: Record<string, string>) {
@@ -54,6 +54,9 @@ export default function MessageList({ url, notify }: MessageListProps) {
             <p role={status === 'failed' ? 'alert' : 'status'} className="mb-4">
                 {t(status === 'failed' ? 'message-list.errors.failed-to-connect' : `message-list.${status}`)}
             </p>
+            {status === 'failed' && (
+                <button type="button" onClick={retry} className="border p-2 mb-4">{t('message-list.retry')}</button>
+            )}
             {status === 'connected' && !messages.length && <p>{t('message-list.empty')}</p>}
             <ul>
                 {messages.map(message => (

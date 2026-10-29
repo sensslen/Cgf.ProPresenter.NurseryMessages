@@ -1,12 +1,11 @@
 {
   "app": {
-    "connect": "कनेक्ट करें",
-    "disconnect": "डिस्कनेक्ट करें",
     "invalidUrl": "क्रेडेंशियल, क्वेरी या फ़्रैगमेंट के बिना HTTP या HTTPS सर्वर का पता दर्ज करें।",
     "loading": "लोड हो रहा है...",
     "enterProPresenterUrl": "ProPresenter से कनेक्शन दर्ज करें"
   },
   "message-list": {
+    "retry": "पुनः प्रयास करें",
     "connecting": "ProPresenter से कनेक्ट हो रहा है...",
     "connected": "ProPresenter से कनेक्ट है।",
     "reconnecting": "कनेक्शन टूट गया। दोबारा कनेक्ट हो रहा है... दिखाए गए संदेश पुराने हो सकते हैं।",

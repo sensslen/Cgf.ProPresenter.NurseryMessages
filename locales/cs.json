@@ -1,12 +1,11 @@
 {
   "app": {
-    "connect": "Připojit",
-    "disconnect": "Odpojit",
     "invalidUrl": "Zadejte adresu serveru HTTP nebo HTTPS bez přihlašovacích údajů, dotazu nebo fragmentu.",
     "loading": "Načítání...",
     "enterProPresenterUrl": "Zadejte připojení k ProPresenter"
   },
   "message-list": {
+    "retry": "Zkusit znovu",
     "connecting": "Připojování k ProPresenter...",
     "connected": "Připojeno k ProPresenter.",
     "reconnecting": "Spojení přerušeno. Opětovné připojování... Zobrazené zprávy mohou být zastaralé.",

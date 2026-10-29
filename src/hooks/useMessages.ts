@@ -12,6 +12,7 @@ interface ConnectionState {
 
 export function useMessages(url: string) {
     const [state, setState] = useState<ConnectionState>({ url, messages: [], status: 'connecting' });
+    const [attempt, setAttempt] = useState(0);
     const session = useRef<AbortController | null>(null);
 
     useEffect(() => {
@@ -63,7 +64,12 @@ export function useMessages(url: string) {
         }
         void connect();
         return () => controller.abort();
-    }, [url]);
+    }, [url, attempt]);
+
+    function retry() {
+        setState(previous => ({ ...previous, status: 'connecting' }));
+        setAttempt(previous => previous + 1);
+    }
 
     function currentSignal(): AbortSignal {
         const signal = session.current?.signal;
@@ -84,5 +90,6 @@ export function useMessages(url: string) {
         status: state.url === url ? state.status : 'connecting',
         showMessage,
         hideMessage,
+        retry,
     };
 }

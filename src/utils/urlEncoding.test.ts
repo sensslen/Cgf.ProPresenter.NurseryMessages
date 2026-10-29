@@ -28,18 +28,18 @@ describe('connection addresses', () => {
         },
     );
 
-    it('adds one history entry per connection change without losing other parameters or fragments', () => {
+    it('updates the connection link without adding history entries or losing other parameters', () => {
         window.history.replaceState(null, '', '/?other=value#anchor');
         const length = window.history.length;
         writeConnectionUrl('http://host:1025');
         expect(readConnectionUrl(window.location.search)).toBe('http://host:1025');
         expect(window.location.search).toContain('other=value');
         expect(window.location.hash).toBe('#anchor');
-        expect(window.history.length).toBe(length + 1);
+        expect(window.history.length).toBe(length);
         writeConnectionUrl('http://host:1025');
-        expect(window.history.length).toBe(length + 1);
+        expect(window.history.length).toBe(length);
         writeConnectionUrl('');
         expect(window.location.search).toBe('?other=value');
-        expect(window.history.length).toBe(length + 2);
+        expect(window.history.length).toBe(length);
     });
 });

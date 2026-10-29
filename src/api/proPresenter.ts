@@ -108,7 +108,12 @@ export async function* streamMessages(url: string, signal: AbortSignal): AsyncGe
 export function createTriggerPayload(message: Message, values: Record<string, string>): TriggerPayload {
     return message.tokens.map(token => ({
         ...token,
-        ...(token.text ? { text: { ...token.text, text: values[token.name] ?? '' } } : {}),
+        ...(token.text ? {
+            text: {
+                ...token.text,
+                text: Object.prototype.hasOwnProperty.call(values, token.name) ? values[token.name] : '',
+            },
+        } : {}),
     }));
 }
 

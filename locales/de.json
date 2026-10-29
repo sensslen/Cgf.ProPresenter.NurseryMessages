@@ -1,12 +1,11 @@
 {
   "app": {
-    "connect": "Verbinden",
-    "disconnect": "Trennen",
     "invalidUrl": "Geben Sie eine HTTP- oder HTTPS-Serveradresse ohne Zugangsdaten, Abfrage oder Fragment ein.",
     "loading": "Lade...",
     "enterProPresenterUrl": "Verbindung zu ProPresenter eingeben"
   },
   "message-list": {
+    "retry": "Erneut versuchen",
     "connecting": "Verbindung zu ProPresenter wird hergestellt...",
     "connected": "Mit ProPresenter verbunden.",
     "reconnecting": "Verbindung unterbrochen. Erneuter Verbindungsversuch... Angezeigte Nachrichten können veraltet sein.",

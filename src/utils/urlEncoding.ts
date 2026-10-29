@@ -47,5 +47,5 @@ export function writeConnectionUrl(value: string): void {
   const address = new URL(window.location.href);
   if (value) address.searchParams.set('url', encodeUrlToBase64(value));
   else address.searchParams.delete('url');
-  if (address.href !== window.location.href) window.history.pushState(null, '', address);
+  if (address.href !== window.location.href) window.history.replaceState(null, '', address);
 }
