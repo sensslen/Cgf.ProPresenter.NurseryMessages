@@ -2,6 +2,16 @@
 
 This application provides a simple and effective way to display nursery messages in ProPresenter. It connects to the ProPresenter API to fetch and trigger messages, making it easy for volunteers and staff to manage nursery alerts without needing to access the main ProPresenter interface.
 
+## Screenshots
+
+The running app with sample messages from a mock ProPresenter API. The interface follows the system light/dark setting; the version remains visible in the footer.
+
+<img width="720" alt="Desktop interface with a grouped message sheet, on-screen indicator, and version footer" src="https://github.com/user-attachments/assets/5758c253-ee4b-48a4-9519-3a3eda57a928">
+
+| Phone, light | Phone, dark |
+| --- | --- |
+| <img width="260" alt="Phone layout in light mode" src="https://github.com/user-attachments/assets/09a813be-bf10-4177-9ef6-ab00e63f7961"> | <img width="260" alt="Phone layout in dark mode" src="https://github.com/user-attachments/assets/78220739-39c3-4b64-86a2-5f77a93b9dc1"> |
+
 ## Features
 
 * **Connect to ProPresenter Remotely**: Enter the network address of your ProPresenter instance to connect to it.
