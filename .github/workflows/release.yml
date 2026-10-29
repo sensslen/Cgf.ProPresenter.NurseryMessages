@@ -14,7 +14,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       - name: Check version format
         uses: nowsprinting/check-version-format-action@v5
@@ -23,7 +23,7 @@ jobs:
           prefix: 'v'
       
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
           cache: 'npm'

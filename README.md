@@ -33,7 +33,7 @@ This section is for developers who want to run the application locally or deploy
 
 ### Running in a Development Environment
 
-Use [Node.js](https://nodejs.org/) 24.15 or later in the Node 24 release line, or Node 26+, with npm. CI uses Node 24 from `.node-version`.
+Use [Node.js](https://nodejs.org/) 24.15 or later in the Node 24 release line, or Node 26+, with npm. CI uses Node 26 from `.node-version`.
 
 1.  **Clone the repository** to your local machine.
 2.  **Install the dependencies** by running the following command in the project's root directory:
