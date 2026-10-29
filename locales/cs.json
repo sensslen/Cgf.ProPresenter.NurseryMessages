@@ -1,9 +1,20 @@
 {
   "app": {
+    "title": "Zprávy z dětského koutku",
+    "connectHint": "Zadejte adresu pro načtení zpráv.",
+    "editingAddress": "Adresa se mění.",
+    "previousConnection": "Předchozí připojení je stále aktivní.",
+    "dismissNotification": "Zavřít oznámení",
+    "invalidUrl": "Zadejte adresu serveru HTTP nebo HTTPS bez přihlašovacích údajů, dotazu nebo fragmentu.",
     "loading": "Načítání...",
     "enterProPresenterUrl": "Zadejte připojení k ProPresenter"
   },
   "message-list": {
+    "retry": "Zkusit znovu",
+    "connecting": "Připojování k ProPresenter...",
+    "connected": "Připojeno k ProPresenter.",
+    "reconnecting": "Spojení přerušeno. Opětovné připojování... Zobrazené zprávy mohou být zastaralé.",
+    "empty": "Nejsou dostupné žádné zprávy.",
     "errors": {
       "failed-to-connect": "Nepodařilo se připojit k ProPresenter. Zkontrolujte informace o připojení.",
       "unknown-error": "Došlo k neočekávané chybě: {{error}}.",
@@ -17,7 +28,9 @@
     }
   },
   "message-item": {
-    "formatted-message": "<0>Formátovaná zpráva:</0> <1>{{message}}</1>",
+    "managed-token": "Nastaveno v ProPresenter",
+    "preview": "Náhled zprávy",
+    "on-screen": "Na obrazovce",
     "show": "Zobrazit",
     "show-again": "Zobrazit znovu",
     "hide": "Skrýt"

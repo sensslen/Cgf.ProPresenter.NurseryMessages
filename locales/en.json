@@ -1,9 +1,20 @@
 {
   "app": {
+    "title": "Nursery messages",
+    "connectHint": "Enter an address to load your messages.",
+    "editingAddress": "Address changing.",
+    "previousConnection": "Previous connection still active.",
+    "dismissNotification": "Dismiss notification",
+    "invalidUrl": "Enter an HTTP or HTTPS server address without credentials, query, or fragment.",
     "loading": "Loading...",
     "enterProPresenterUrl": "Enter connection to ProPresenter"
   },
   "message-list": {
+    "retry": "Retry",
+    "connecting": "Connecting to ProPresenter...",
+    "connected": "Connected to ProPresenter.",
+    "reconnecting": "Connection lost. Reconnecting... Displayed messages may be outdated.",
+    "empty": "No messages are available.",
     "errors": {
       "failed-to-connect": "Failed to connect to ProPresenter. Please check the connection information.",
       "unknown-error": "An unexpected error occurred: {{error}}.",
@@ -17,7 +28,9 @@
     }
   },
   "message-item": {
-    "formatted-message": "<0>Formatted message:</0> <1>{{message}}</1>",
+    "managed-token": "Configured in ProPresenter",
+    "preview": "Message preview",
+    "on-screen": "On screen",
     "show": "Show",
     "show-again": "Show again",
     "hide": "Hide"

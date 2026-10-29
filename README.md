@@ -2,13 +2,24 @@
 
 This application provides a simple and effective way to display nursery messages in ProPresenter. It connects to the ProPresenter API to fetch and trigger messages, making it easy for volunteers and staff to manage nursery alerts without needing to access the main ProPresenter interface.
 
+## Screenshots
+
+The running app with sample messages from a mock ProPresenter API. The interface follows the system light/dark setting; the version remains visible in the footer.
+
+<img width="720" alt="Desktop interface with a grouped message sheet, on-screen indicator, and version footer" src="https://github.com/user-attachments/assets/5758c253-ee4b-48a4-9519-3a3eda57a928">
+
+| Phone, light | Phone, dark |
+| --- | --- |
+| <img width="260" alt="Phone layout in light mode" src="https://github.com/user-attachments/assets/09a813be-bf10-4177-9ef6-ab00e63f7961"> | <img width="260" alt="Phone layout in dark mode" src="https://github.com/user-attachments/assets/78220739-39c3-4b64-86a2-5f77a93b9dc1"> |
+
 ## Features
 
 * **Connect to ProPresenter Remotely**: Enter the network address of your ProPresenter instance to connect to it.
 * **View Available Messages**: The application will list all available messages from your ProPresenter setup.
 * **Fill in Message Tokens**: If a message contains tokens (e.g., for a child's name or number), you can easily fill them in before displaying the message.
-* **Real-time Updates**: The message list automatically refreshes every second, so you always have the most up-to-date information.
+* **Real-time Updates**: Messages update through ProPresenter's chunked stream. Lost connections reconnect automatically with backoff; the connection status warns when displayed messages may be stale.
 * **Localized Interface**: The user interface is available in multiple languages including English, German, Spanish, French, Portuguese, Korean, Norwegian, Czech, Simplified Chinese, Russian, Hindi, Arabic, and Bengali. The application automatically detects your browser's language.
+* **Responsive Design**: A single message sheet adapts to phones and tablets, follows the system light/dark setting, and supports right-to-left layouts. Connection status stays visible while scrolling. The version footer and action notifications have their own space, so they never cover message controls.
 
 ## How to Use
 
@@ -16,9 +27,18 @@ This section is for end-users who will be operating the application.
 
 1.  **Open the application** in your web browser.
 2.  **Enter the network address** for your ProPresenter instance in the input field (e.g., `http://localhost:1025`).
-3.  The application will automatically **fetch and display a list of available messages**.
-4.  For any message, **fill in the required token values** in the provided input fields.
+3.  The application connects automatically after you stop typing for half a second. The connection status stays visible below the address. Clear the address to disconnect immediately. A **"Retry"** button appears only after a connection error that cannot be retried automatically.
+4.  For any message, **fill in text token values** in the provided input fields. Timer and clock tokens retain their configuration from ProPresenter.
 5.  Click the **"Show"** button to trigger the message in ProPresenter.
+6.  Click **"Hide"** to clear an active message. You can bookmark or share the connected page's URL to restore the connection later. Older connection links remain supported.
+
+An **"On screen"** label reflects ProPresenter's reported message state. **Message preview** shows your current draft, which may differ from the text last sent to the screen. Editing an address leaves the previous connection running until a valid replacement is ready; the status explains which connection is still active.
+
+The browser must be able to reach ProPresenter's network API. `localhost` refers to the device running the browser, not a different presentation computer. For another computer, use its LAN address and configured API port.
+
+HTTP and HTTPS server addresses are supported, including a reverse-proxy path prefix. Do not include credentials, query parameters, or a fragment. The connection address is encoded in the page URL for bookmarking, not encrypted.
+
+The web host and ProPresenter API can be different origins. ProPresenter or a local reverse proxy must allow the web page's origin through CORS. An HTTPS page connecting to an HTTP LAN endpoint may be blocked by browser mixed-content or local-network access policies. Use a compatible local hosting arrangement or an HTTPS reverse proxy when needed; do not disable browser security protections. Only expose the API to trusted operators on a trusted network.
 
 ## How to Run and Deploy for Developers
 
@@ -26,18 +46,32 @@ This section is for developers who want to run the application locally or deploy
 
 ### Running in a Development Environment
 
-To run this application locally for development, you will need to have [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed.
+Use [Node.js](https://nodejs.org/) 24.15 or later in the Node 24 release line, or Node 26+, with npm. CI uses Node 26 from `.node-version`.
 
 1.  **Clone the repository** to your local machine.
 2.  **Install the dependencies** by running the following command in the project's root directory:
     ```bash
-    npm install
+    npm ci
     ```
 3.  **Start the development server** with the following command:
     ```bash
     npm run dev
     ```
 4.  Open your web browser and navigate to the local address provided by Vite (usually `http://localhost:5173`).
+
+### Development checks and architecture
+
+Run `npm run lint`, `npm test`, and `npm run build` before submitting changes. Pull requests and releases run these checks automatically.
+
+The browser connects directly to ProPresenter; no application backend or global state store is required. The API module validates responses and yields messages from an abortable async stream. `useMessages` owns connection lifetime, reconnection, and server state. Message editors own text drafts and keep them across stream updates; switching connections resets them. Show/hide requests have a 15-second timeout and are cancelled when their connection is removed.
+
+Malformed payloads stop the connection and produce a visible error instead of silently preserving stale data. Each JSON message or message list is limited to 1,048,576 UTF-16 code units in the decoded JSON source, before JSON parsing. Transient transport failures retry with jitter up to a 30-second delay. Click Retry after correcting a terminal server or protocol error. Address edits update the bookmarkable URL without creating browser-history entries.
+
+Token validation checks names and editable text. Timer, clock, and other ProPresenter-owned configuration passes through unchanged, including fields not described by the [published API schema](https://openapi.propresenter.com/). This avoids rejecting new token layouts or dropping metadata.
+
+Tests use mocked streams and requests, including fragmented UTF-8/JSON, cancellation, retries, message actions, and connection navigation. A live ProPresenter instance is still needed to verify server compatibility and browser network permissions.
+
+TypeScript stays on the latest 6.0 patch while `typescript-eslint` requires TypeScript below 6.1. Upgrade both together when its peer range supports TypeScript 7.
 
 ### Deploying to a Static Web Server
 

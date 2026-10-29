@@ -1,9 +1,20 @@
 {
   "app": {
+    "title": "Meldinger fra barnepass",
+    "connectHint": "Skriv inn en adresse for å laste inn meldingene dine.",
+    "editingAddress": "Adressen endres.",
+    "previousConnection": "Den forrige tilkoblingen er fortsatt aktiv.",
+    "dismissNotification": "Lukk varsel",
+    "invalidUrl": "Skriv inn en HTTP- eller HTTPS-serveradresse uten påloggingsinformasjon, spørring eller fragment.",
     "loading": "Laster...",
     "enterProPresenterUrl": "Skriv inn tilkobling til ProPresenter"
   },
   "message-list": {
+    "retry": "Prøv igjen",
+    "connecting": "Kobler til ProPresenter...",
+    "connected": "Koblet til ProPresenter.",
+    "reconnecting": "Tilkoblingen ble brutt. Kobler til på nytt... Viste meldinger kan være utdaterte.",
+    "empty": "Ingen meldinger er tilgjengelige.",
     "errors": {
       "failed-to-connect": "Kunne ikke koble til ProPresenter. Vennligst sjekk tilkoblingsinformasjonen.",
       "unknown-error": "En uventet feil oppstod: {{error}}.",
@@ -17,7 +28,9 @@
     }
   },
   "message-item": {
-    "formatted-message": "<0>Formatert melding:</0> <1>{{message}}</1>",
+    "managed-token": "Konfigurert i ProPresenter",
+    "preview": "Forhåndsvisning av melding",
+    "on-screen": "På skjermen",
     "show": "Vis",
     "show-again": "Vis igjen",
     "hide": "Skjul"

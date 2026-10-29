@@ -1,9 +1,20 @@
 {
   "app": {
+    "title": "Mensajes de la guardería",
+    "connectHint": "Introduce una dirección para cargar tus mensajes.",
+    "editingAddress": "La dirección está cambiando.",
+    "previousConnection": "La conexión anterior sigue activa.",
+    "dismissNotification": "Cerrar notificación",
+    "invalidUrl": "Ingrese una dirección de servidor HTTP o HTTPS sin credenciales, consulta ni fragmento.",
     "loading": "Cargando...",
     "enterProPresenterUrl": "Ingrese la conexión a ProPresenter"
   },
   "message-list": {
+    "retry": "Reintentar",
+    "connecting": "Conectando con ProPresenter...",
+    "connected": "Conectado a ProPresenter.",
+    "reconnecting": "Se perdió la conexión. Reconectando... Los mensajes mostrados pueden estar desactualizados.",
+    "empty": "No hay mensajes disponibles.",
     "errors": {
       "failed-to-connect": "Error al conectar con ProPresenter. Por favor, verifique la información de conexión.",
       "unknown-error": "Ocurrió un error inesperado: {{error}}.",
@@ -17,7 +28,9 @@
     }
   },
   "message-item": {
-    "formatted-message": "<0>Mensaje formateado:</0> <1>{{message}}</1>",
+    "managed-token": "Configurado en ProPresenter",
+    "preview": "Vista previa del mensaje",
+    "on-screen": "En pantalla",
     "show": "Mostrar",
     "show-again": "Mostrar de nuevo",
     "hide": "Ocultar"

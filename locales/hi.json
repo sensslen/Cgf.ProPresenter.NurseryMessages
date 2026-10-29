@@ -1,9 +1,20 @@
 {
   "app": {
+    "title": "शिशु देखभाल के संदेश",
+    "connectHint": "अपने संदेश लोड करने के लिए पता दर्ज करें।",
+    "editingAddress": "पता बदला जा रहा है।",
+    "previousConnection": "पिछला कनेक्शन अभी भी सक्रिय है।",
+    "dismissNotification": "सूचना बंद करें",
+    "invalidUrl": "क्रेडेंशियल, क्वेरी या फ़्रैगमेंट के बिना HTTP या HTTPS सर्वर का पता दर्ज करें।",
     "loading": "लोड हो रहा है...",
     "enterProPresenterUrl": "ProPresenter से कनेक्शन दर्ज करें"
   },
   "message-list": {
+    "retry": "पुनः प्रयास करें",
+    "connecting": "ProPresenter से कनेक्ट हो रहा है...",
+    "connected": "ProPresenter से कनेक्ट है।",
+    "reconnecting": "कनेक्शन टूट गया। दोबारा कनेक्ट हो रहा है... दिखाए गए संदेश पुराने हो सकते हैं।",
+    "empty": "कोई संदेश उपलब्ध नहीं है।",
     "errors": {
       "failed-to-connect": "ProPresenter से कनेक्ट करने में विफल। कृपया कनेक्शन जानकारी की जांच करें।",
       "unknown-error": "एक अप्रत्याशित त्रुटि हुई: {{error}}।",
@@ -17,7 +28,9 @@
     }
   },
   "message-item": {
-    "formatted-message": "<0>स्वरूपित संदेश:</0> <1>{{message}}</1>",
+    "managed-token": "ProPresenter में कॉन्फ़िगर किया गया",
+    "preview": "संदेश का पूर्वावलोकन",
+    "on-screen": "स्क्रीन पर",
     "show": "दिखाएं",
     "show-again": "फिर से दिखाएं",
     "hide": "छुपाएं"

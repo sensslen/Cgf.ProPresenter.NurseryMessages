@@ -1,9 +1,20 @@
 {
   "app": {
+    "title": "رسائل الحضانة",
+    "connectHint": "أدخل عنوانًا لتحميل رسائلك.",
+    "editingAddress": "جارٍ تغيير العنوان.",
+    "previousConnection": "الاتصال السابق لا يزال نشطًا.",
+    "dismissNotification": "إغلاق الإشعار",
+    "invalidUrl": "أدخل عنوان خادم HTTP أو HTTPS بدون بيانات اعتماد أو استعلام أو جزء مرجعي.",
     "loading": "جاري التحميل...",
     "enterProPresenterUrl": "أدخل الاتصال بـ ProPresenter"
   },
   "message-list": {
+    "retry": "إعادة المحاولة",
+    "connecting": "جارٍ الاتصال بـ ProPresenter...",
+    "connected": "متصل بـ ProPresenter.",
+    "reconnecting": "انقطع الاتصال. جارٍ إعادة الاتصال... قد تكون الرسائل المعروضة قديمة.",
+    "empty": "لا توجد رسائل متاحة.",
     "errors": {
       "failed-to-connect": "فشل الاتصال بـ ProPresenter. يرجى التحقق من معلومات الاتصال.",
       "unknown-error": "حدث خطأ غير متوقع: {{error}}.",
@@ -17,7 +28,9 @@
     }
   },
   "message-item": {
-    "formatted-message": "<0>رسالة منسقة:</0> <1>{{message}}</1>",
+    "managed-token": "تم تكوينه في ProPresenter",
+    "preview": "معاينة الرسالة",
+    "on-screen": "على الشاشة",
     "show": "عرض",
     "show-again": "عرض مرة أخرى",
     "hide": "إخفاء"

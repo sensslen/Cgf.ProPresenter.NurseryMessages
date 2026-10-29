@@ -1,9 +1,20 @@
 {
   "app": {
+    "title": "শিশুযত্নের বার্তা",
+    "connectHint": "আপনার বার্তা লোড করতে একটি ঠিকানা লিখুন।",
+    "editingAddress": "ঠিকানা পরিবর্তন হচ্ছে।",
+    "previousConnection": "আগের সংযোগ এখনও সক্রিয়।",
+    "dismissNotification": "বিজ্ঞপ্তি বন্ধ করুন",
+    "invalidUrl": "পরিচয়পত্র, কোয়েরি বা ফ্র্যাগমেন্ট ছাড়া একটি HTTP বা HTTPS সার্ভারের ঠিকানা লিখুন।",
     "loading": "লোড হচ্ছে...",
     "enterProPresenterUrl": "ProPresenter এর সাথে সংযোগ লিখুন"
   },
   "message-list": {
+    "retry": "আবার চেষ্টা করুন",
+    "connecting": "ProPresenter-এর সাথে সংযোগ করা হচ্ছে...",
+    "connected": "ProPresenter-এর সাথে সংযুক্ত।",
+    "reconnecting": "সংযোগ বিচ্ছিন্ন হয়েছে। পুনরায় সংযোগ করা হচ্ছে... প্রদর্শিত বার্তাগুলি পুরোনো হতে পারে।",
+    "empty": "কোনো বার্তা উপলব্ধ নেই।",
     "errors": {
       "failed-to-connect": "ProPresenter এর সাথে সংযোগ করতে ব্যর্থ হয়েছে। অনুগ্রহ করে সংযোগের তথ্য পরীক্ষা করুন।",
       "unknown-error": "একটি অপ্রত্যাশিত ত্রুটি ঘটেছে: {{error}}।",
@@ -17,7 +28,9 @@
     }
   },
   "message-item": {
-    "formatted-message": "<0>বিন্যাসিত বার্তা:</0> <1>{{message}}</1>",
+    "managed-token": "ProPresenter-এ কনফিগার করা হয়েছে",
+    "preview": "বার্তার পূর্বরূপ",
+    "on-screen": "পর্দায় দেখানো হচ্ছে",
     "show": "প্রদর্শন করুন",
     "show-again": "আবার প্রদর্শন করুন",
     "hide": "লুকান"
