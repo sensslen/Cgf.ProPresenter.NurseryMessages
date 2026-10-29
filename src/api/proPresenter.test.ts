@@ -181,6 +181,24 @@ describe('message actions', () => {
             .rejects.toMatchObject({ name: 'AbortError' });
     });
 
+    it.each(['AbortError', 'TimeoutError'])('rejects with %s when cancelled during response cleanup', async name => {
+        vi.useFakeTimers();
+        const controller = new AbortController();
+        const body = new ReadableStream({
+            async cancel() {
+                if (name === 'AbortError') {
+                    controller.abort();
+                } else {
+                    await vi.advanceTimersByTimeAsync(15_000);
+                }
+            },
+        });
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(body)));
+        await expect(clearMessage('http://host', 'id', controller.signal))
+            .rejects.toMatchObject({ name });
+        expect(vi.getTimerCount()).toBe(0);
+    });
+
     it('applies a 15-second timeout to commands without timing out the stream', async () => {
         vi.useFakeTimers();
         vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockImplementation(async (_, init) => {

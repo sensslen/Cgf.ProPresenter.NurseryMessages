@@ -127,6 +127,7 @@ async function requestMessage(resource: string, init: RequestInit, signal: Abort
         const response = await fetch(resource, { ...init, signal: controller.signal });
         controller.signal.throwIfAborted();
         await response.body?.cancel();
+        controller.signal.throwIfAborted();
         if (!response.ok) {
             throw new StreamError(`Message request failed: ${response.status}`, response.status);
         }
