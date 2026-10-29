@@ -1,9 +1,16 @@
 {
   "app": {
+    "connect": "Connecter",
+    "disconnect": "Déconnecter",
+    "invalidUrl": "Saisissez une adresse de serveur HTTP ou HTTPS sans identifiants, paramètres de requête ni fragment.",
     "loading": "Chargement...",
     "enterProPresenterUrl": "Entrer la connexion à ProPresenter"
   },
   "message-list": {
+    "connecting": "Connexion à ProPresenter...",
+    "connected": "Connecté à ProPresenter.",
+    "reconnecting": "Connexion perdue. Reconnexion... Les messages affichés peuvent être obsolètes.",
+    "empty": "Aucun message disponible.",
     "errors": {
       "failed-to-connect": "Échec de la connexion à ProPresenter. Veuillez vérifier les informations de connexion.",
       "unknown-error": "Une erreur inattendue s'est produite : {{error}}.",
@@ -17,6 +24,7 @@
     }
   },
   "message-item": {
+    "managed-token": "Configuré dans ProPresenter",
     "formatted-message": "<0>Message formaté :</0> <1>{{message}}</1>",
     "show": "Afficher",
     "show-again": "Afficher à nouveau",

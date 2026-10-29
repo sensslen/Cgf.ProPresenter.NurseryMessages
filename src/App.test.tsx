@@ -1,0 +1,127 @@
+// @vitest-environment jsdom
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import App from './App';
+import i18n from './i18n';
+import { message, timer } from './test/messages';
+import { encodeUrlToBase64 } from './utils/urlEncoding';
+
+beforeEach(async () => {
+    window.history.replaceState(null, '', '/');
+    await i18n.changeLanguage('en');
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+});
+
+afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+});
+
+describe('operator workflow', () => {
+    it('connects only on submission and restores the active address on navigation', async () => {
+        const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 403 }));
+        vi.stubGlobal('fetch', fetch);
+        render(<App />);
+        fireEvent.change(screen.getByLabelText('Enter connection to ProPresenter'), { target: { value: 'http://one:1025' } });
+        expect(fetch).not.toHaveBeenCalled();
+        await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Connect' })));
+        expect(fetch).toHaveBeenCalledOnce();
+        fireEvent.change(screen.getByLabelText('Enter connection to ProPresenter'), { target: { value: 'http://two:1025' } });
+        expect(fetch).toHaveBeenCalledOnce();
+        await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Connect' })));
+        expect(fetch).toHaveBeenLastCalledWith('http://two:1025/v1/messages?chunked=true', expect.anything());
+        await act(async () => {
+            const navigated = new Promise<void>(resolve => {
+                window.addEventListener('popstate', () => resolve(), { once: true });
+            });
+            window.history.back();
+            await navigated;
+        });
+        expect(fetch).toHaveBeenLastCalledWith('http://one:1025/v1/messages?chunked=true', expect.anything());
+        fireEvent.click(screen.getByRole('button', { name: 'Disconnect' }));
+        expect(screen.queryByRole('button', { name: 'Disconnect' })).toBeNull();
+    });
+
+    it('retries the same address when Connect is pressed after a terminal failure', async () => {
+        const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 403 }));
+        vi.stubGlobal('fetch', fetch);
+        render(<App />);
+        fireEvent.change(screen.getByLabelText('Enter connection to ProPresenter'), { target: { value: 'http://host' } });
+        await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Connect' })));
+        expect(screen.getByRole('alert')).toBeDefined();
+        const historyLength = window.history.length;
+        await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Connect' })));
+        expect(fetch).toHaveBeenCalledTimes(2);
+        expect(window.history.length).toBe(historyLength);
+    });
+
+    it('preserves drafts on updates, makes timers read-only, and submits show/hide payloads', async () => {
+        window.history.replaceState(null, '', `?url=${encodeUrlToBase64('http://host')}`);
+        const readers: ReadableStreamDefaultController<Uint8Array>[] = [];
+        const fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async (input, init) => {
+            if (String(input).endsWith('chunked=true')) {
+                return new Response(new ReadableStream({
+                    start(controller) {
+                        readers.push(controller);
+                        init?.signal?.addEventListener('abort', () => controller.error(init.signal?.reason), { once: true });
+                    },
+                }));
+            }
+            return new Response(null, { status: 204 });
+        });
+        vi.stubGlobal('fetch', fetch);
+        render(<App />);
+        const data = { ...message, tokens: [...message.tokens, timer] };
+        await act(async () => readers[0].enqueue(new TextEncoder().encode(JSON.stringify([data]))));
+        fireEvent.change(screen.getByLabelText('Child'), { target: { value: '$& {Timer}' } });
+        expect(screen.queryByLabelText('Timer')).toBeNull();
+        expect(screen.getByText('Timer: Configured in ProPresenter')).toBeDefined();
+        await act(async () => readers[0].enqueue(new TextEncoder().encode(JSON.stringify({ ...data, is_active: true }))));
+        expect(screen.getByDisplayValue('$& {Timer}')).toBeDefined();
+        await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Show again' })));
+        expect(fetch).toHaveBeenLastCalledWith('http://host/v1/message/message-1/trigger', expect.anything());
+        const body = fetch.mock.lastCall?.[1]?.body;
+        if (typeof body !== 'string') throw new Error('Expected a JSON request body');
+        expect(JSON.parse(body)).toEqual([{ name: 'Child', text: { text: '$& {Timer}' } }, timer]);
+        expect(screen.getByText('Message "Please collect $& {Timer}." is now shown.')).toBeDefined();
+        await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Hide' })));
+        expect(fetch).toHaveBeenLastCalledWith('http://host/v1/message/message-1/clear', expect.anything());
+    });
+
+    it('updates the document language and direction for Arabic', async () => {
+        render(<App />);
+        await act(async () => i18n.changeLanguage('ar'));
+        expect(document.documentElement.lang).toBe('ar');
+        expect(document.documentElement.dir).toBe('rtl');
+        expect(screen.getByRole('button', { name: 'اتصال' })).toBeDefined();
+        await act(async () => i18n.changeLanguage('ja'));
+        expect(document.documentElement.lang).toBe('en');
+        expect(document.documentElement.dir).toBe('ltr');
+    });
+
+    it('disables pending actions and ignores their completion after disconnect', async () => {
+        window.history.replaceState(null, '', `?url=${encodeUrlToBase64('http://host')}`);
+        let finish: ((response: Response) => void) | undefined;
+        const command = new Promise<Response>(resolve => { finish = resolve; });
+        vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockImplementation(async (input, init) => {
+            if (!String(input).endsWith('chunked=true')) return command;
+            return new Response(new ReadableStream({
+                start(controller) {
+                    controller.enqueue(new TextEncoder().encode(JSON.stringify([message])));
+                    init?.signal?.addEventListener('abort', () => controller.error(init.signal?.reason), { once: true });
+                },
+            }));
+        }));
+        await act(async () => { render(<App />); });
+        fireEvent.click(screen.getByRole('button', { name: 'Show' }));
+        expect(screen.getByRole('button', { name: 'Show' }).hasAttribute('disabled')).toBe(true);
+        fireEvent.click(screen.getByRole('button', { name: 'Disconnect' }));
+        await act(async () => {
+            if (!finish) throw new Error('Expected a pending command');
+            finish(new Response(null, { status: 204 }));
+        });
+        expect(screen.queryByText(/is now shown/)).toBeNull();
+        expect(screen.queryByRole('alert')).toBeNull();
+    });
+});

@@ -1,29 +1,24 @@
-import React, { useCallback } from 'react';
-import { Token } from '../types/proPresenter';
+import { useId } from 'react';
+import type { Token } from '../types/proPresenter';
 
 interface TokenInputProps {
     token: Token;
     tokenValue: string;
-    setTokenValue: (value: string) => void; // Explicitly typed
+    setTokenValue: (value: string) => void;
 }
 
-const TokenInput: React.FC<TokenInputProps> = ({ token, tokenValue, setTokenValue }) => {
-    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setTokenValue(e.target.value);
-    }, [setTokenValue]);
-
+export default function TokenInput({ token, tokenValue, setTokenValue }: TokenInputProps) {
+    const id = useId();
     return (
         <div className="my-2">
-            <label className="block">{token.name}</label>
+            <label htmlFor={id} className="block">{token.name}</label>
             <input
+                id={id}
                 type="text"
                 value={tokenValue}
-                placeholder={token.name}
-                onChange={handleChange}
+                onChange={event => setTokenValue(event.target.value)}
                 className="border p-2 w-full"
             />
         </div>
     );
-};
-
-export default TokenInput;
+}

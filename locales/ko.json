@@ -1,9 +1,16 @@
 {
   "app": {
+    "connect": "연결",
+    "disconnect": "연결 해제",
+    "invalidUrl": "인증 정보, 쿼리 또는 프래그먼트가 없는 HTTP 또는 HTTPS 서버 주소를 입력하세요.",
     "loading": "로딩 중...",
     "enterProPresenterUrl": "ProPresenter 연결 입력"
   },
   "message-list": {
+    "connecting": "ProPresenter에 연결 중...",
+    "connected": "ProPresenter에 연결되었습니다.",
+    "reconnecting": "연결이 끊겼습니다. 다시 연결 중... 표시된 메시지가 최신 상태가 아닐 수 있습니다.",
+    "empty": "사용 가능한 메시지가 없습니다.",
     "errors": {
       "failed-to-connect": "ProPresenter 연결에 실패했습니다. 연결 정보를 확인하세요.",
       "unknown-error": "예기치 않은 오류가 발생했습니다: {{error}}.",
@@ -17,6 +24,7 @@
     }
   },
   "message-item": {
+    "managed-token": "ProPresenter에서 설정됨",
     "formatted-message": "<0>서식이 지정된 메시지:</0> <1>{{message}}</1>",
     "show": "표시",
     "show-again": "다시 표시",

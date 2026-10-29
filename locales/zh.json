@@ -1,9 +1,16 @@
 {
   "app": {
+    "connect": "连接",
+    "disconnect": "断开连接",
+    "invalidUrl": "请输入不含凭据、查询参数或片段的 HTTP 或 HTTPS 服务器地址。",
     "loading": "加载中...",
     "enterProPresenterUrl": "输入连接到ProPresenter"
   },
   "message-list": {
+    "connecting": "正在连接 ProPresenter...",
+    "connected": "已连接到 ProPresenter。",
+    "reconnecting": "连接已断开。正在重新连接... 显示的消息可能已过时。",
+    "empty": "没有可用的消息。",
     "errors": {
       "failed-to-connect": "连接到ProPresenter失败。请检查连接信息。",
       "unknown-error": "发生意外错误：{{error}}。",
@@ -17,6 +24,7 @@
     }
   },
   "message-item": {
+    "managed-token": "在 ProPresenter 中配置",
     "formatted-message": "<0>格式化消息：</0> <1>{{message}}</1>",
     "show": "显示",
     "show-again": "再次显示",

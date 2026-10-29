@@ -1,44 +1,51 @@
-/**
- * Encodes a URL string to URL-safe Base64 format for safe URL parameter usage
- * Uses URL-safe Base64 encoding (RFC 4648 §5) by replacing + with -, / with _, and removing padding =
- * @param url - The URL string to encode
- * @returns URL-safe Base64 encoded string
- */
-export const encodeUrlToBase64 = (url: string): string => {
+export class InvalidConnectionUrlError extends Error {}
+
+export function normalizeConnectionUrl(value: string): string {
+  let url: URL;
   try {
-    // Use btoa for browser-compatible Base64 encoding
-    // First encode to handle UTF-8 characters properly
-    const utf8Bytes = new TextEncoder().encode(url);
-    const binaryString = Array.from(utf8Bytes, byte => String.fromCharCode(byte)).join('');
-    const base64 = btoa(binaryString);
-    // Convert to URL-safe Base64 by replacing + with -, / with _, and removing padding =
-    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  } catch (error) {
-    console.error('Error encoding URL to Base64:', error);
-    throw new Error('Failed to encode URL to Base64');
+    url = new URL(value.trim());
+  } catch {
+    throw new InvalidConnectionUrlError('Enter an absolute HTTP or HTTPS address');
   }
+  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.search || url.hash) {
+    throw new InvalidConnectionUrlError('Use an HTTP or HTTPS server address without credentials, query, or fragment');
+  }
+  url.search = '';
+  url.hash = '';
+  return url.href.replace(/\/+$/, '');
+}
+
+export const encodeUrlToBase64 = (url: string): string => {
+  const bytes = new TextEncoder().encode(url);
+  return btoa(Array.from(bytes, byte => String.fromCharCode(byte)).join(''))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 };
 
-/**
- * Decodes a URL-safe Base64 encoded URL string
- * Handles both URL-safe and standard Base64 formats
- * @param encodedUrl - The Base64 encoded URL string
- * @returns Decoded URL string
- */
-export const decodeBase64ToUrl = (encodedUrl: string): string => {
-  try {
-    // Convert URL-safe Base64 back to standard Base64
-    let base64 = encodedUrl.replace(/-/g, '+').replace(/_/g, '/');
-    // Add padding if necessary
-    while (base64.length % 4 !== 0) {
-      base64 += '=';
-    }
-    // Use atob for browser-compatible Base64 decoding
-    const binaryString = atob(base64);
-    const bytes = Uint8Array.from(binaryString, char => char.charCodeAt(0));
-    return new TextDecoder().decode(bytes);
-  } catch (error) {
-    console.error('Error decoding Base64 to URL:', error);
-    throw new Error('Failed to decode Base64 to URL');
-  }
+export const decodeBase64ToUrl = (value: string): string => {
+  const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+  const binary = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='));
+  return new TextDecoder('utf-8', { fatal: true })
+    .decode(Uint8Array.from(binary, char => char.charCodeAt(0)));
 };
+
+export function readConnectionUrl(search: string): string {
+  const value = new URLSearchParams(search).get('url') ?? '';
+  if (!value || /^https?:\/\//i.test(value)) return value;
+  try {
+    return decodeBase64ToUrl(value);
+  } catch {
+    // Older links encoded the address with encodeURIComponent instead of Base64.
+    try {
+      return decodeURIComponent(value);
+    } catch {
+      return value;
+    }
+  }
+}
+
+export function writeConnectionUrl(value: string): void {
+  const address = new URL(window.location.href);
+  if (value) address.searchParams.set('url', encodeUrlToBase64(value));
+  else address.searchParams.delete('url');
+  if (address.href !== window.location.href) window.history.pushState(null, '', address);
+}

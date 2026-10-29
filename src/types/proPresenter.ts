@@ -1,75 +1,28 @@
-// src/types/proPresenter.ts
+import { z } from 'zod';
 
-export interface TokenText {
-    text: string;
-}
+const idSchema = z.object({
+    uuid: z.string(),
+    index: z.number(),
+    name: z.string(),
+});
 
-export interface TokenTimerConfiguration {
-    allows_overrun: boolean;
-    countdown?: {
-        duration: number;
-    };
-    count_down_to_time?: {
-        period: string;
-        time_of_day: string;
-    };
-    elapsed?: {
-        start_time: number;
-        end_time?: number;
-    };
-}
+// Only text is edited here. ProPresenter owns all other token configuration.
+export const tokenSchema = z.looseObject({
+    name: z.string(),
+    text: z.looseObject({ text: z.string() }).optional(),
+});
 
-export interface TokenTimerFormat {
-    hour: string;
-    millisecond: string;
-    minute: string;
-    second: string;
-}
+export const messageSchema = z.object({
+    id: idSchema,
+    message: z.string(),
+    tokens: z.array(tokenSchema).default([]),
+    visible_on_network: z.boolean(),
+    is_active: z.boolean().optional(),
+});
 
-export interface TokenTimer {
-    configuration: TokenTimerConfiguration;
-    format: TokenTimerFormat;
-}
+export const messageUpdateSchema = z.union([messageSchema, z.array(messageSchema)]);
 
-export interface TokenClock {
-    date: string;
-    is_24_hours: boolean;
-    time: string;
-}
-
-export interface Token {
-    name: string;
-    text?: TokenText;
-    timer?: TokenTimer;
-    clock?: TokenClock;
-}
-
-export interface MessageId {
-    index: number;
-    name: string;
-    uuid: string;
-}
-
-export interface Message {
-    id: MessageId;
-    message: string;
-    tokens: Token[];
-    visible_on_network: boolean;
-    is_active?: boolean;
-}
-
-export interface TriggerPayloadToken {
-    name: string;
-    text?: TokenText;
-    timer?: {
-        configuration: TokenTimerConfiguration;
-        format: TokenTimerFormat;
-    };
-    clock?: {
-        date: string;
-        is_24_hours: boolean;
-        time: string;
-    };
-}
-
-export type TriggerPayload = TriggerPayloadToken[];
+export type Token = z.infer<typeof tokenSchema>;
+export type Message = z.infer<typeof messageSchema>;
+export type MessageUpdate = z.infer<typeof messageUpdateSchema>;
+export type TriggerPayload = Token[];

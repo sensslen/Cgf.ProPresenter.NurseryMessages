@@ -1,269 +1,147 @@
-import { z } from 'zod';
-import { Message, TriggerPayload } from '../types/proPresenter';
+import { messageUpdateSchema } from '../types/proPresenter';
+import type { Message, MessageUpdate, TriggerPayload } from '../types/proPresenter';
+import { normalizeConnectionUrl } from '../utils/urlEncoding';
 
-// Custom error class for stream failures with typed status code
 export class StreamError extends Error {
-    readonly statusCode: number;
-    readonly name = 'StreamError';
-
-    constructor(message: string, statusCode: number) {
+    constructor(message: string, readonly statusCode: number) {
         super(message);
-        this.statusCode = statusCode;
-        Object.setPrototypeOf(this, StreamError.prototype);
+        this.name = 'StreamError';
     }
 }
 
-// Zod schema for Message validation
-const messageIdSchema = z.object({
-    uuid: z.string(),
-    index: z.number(),
-    name: z.string()
-});
+export class StreamProtocolError extends Error {}
 
-const messageObjectSchema = z.object({
-    id: messageIdSchema,
-    message: z.string(),
-    tokens: z.array(z.any()), // tokens have complex optional structure, validate as array of any
-    visible_on_network: z.boolean(),
-    is_active: z.boolean().optional()
-});
+const MAX_MESSAGE_LENGTH = 1_048_576;
 
-// Accept either a single message or an array of messages
-const messageSchema = z.union([
-    messageObjectSchema,
-    z.array(messageObjectSchema)
-]);
+export async function* streamMessages(url: string, signal: AbortSignal): AsyncGenerator<MessageUpdate> {
+    const resource = `${normalizeConnectionUrl(url)}/v1/messages?chunked=true`;
+    const response = await fetch(resource, { signal });
+    if (!response.ok) {
+        await response.body?.cancel();
+        throw new StreamError(`Failed to stream messages: ${response.status}`, response.status);
+    }
+    if (!response.body) {
+        throw new StreamProtocolError('Message stream has no body');
+    }
 
-const validateMessage = (data: unknown) => {
-    const result = messageSchema.safeParse(data);
-    // Cast to proper Message type since we've validated the structure
-    return {
-        success: result.success,
-        data: result.success ? (result.data as Message | Message[]) : undefined,
-        error: result.error
-    };
-};
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    let buffer = '';
+    let offset = 0;
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
 
-const isValidUrl = (inputUrl: string): boolean => {
     try {
-        // Use URL constructor for basic format validation
-        new URL(inputUrl);
-        return true;
-    } catch {
-        return false;
-    }
-};
-
-// Detect if an error is an AbortError
-const isAbortError = (err: unknown): boolean => {
-    if (err instanceof DOMException && err.name === 'AbortError') {
-        return true;
-    }
-    if ((err as { name?: string })?.name === 'AbortError') {
-        return true;
-    }
-    return false;
-};
-
-// Stream messages using the chunked endpoint. Returns an AbortController to stop the stream.
-// The function returns the controller synchronously and runs the async connection logic in the background.
-export const streamMessages = (
-    url: string,
-    onChunk: (data: Message[] | Message) => void,
-    onOpen?: () => void,
-    onClose?: () => void,
-    onError?: (err: unknown) => void,
-): AbortController => {
-    const controller = new AbortController();
-
-    // Run connection logic asynchronously in the background without awaiting
-    (async () => {
-        // Validate URL synchronously before starting async work
-        if (!isValidUrl(url)) {
-            // Defer error/close callbacks to after controller is returned to caller
-            queueMicrotask(() => {
-                onError?.(new Error('Invalid URL format'));
-                onClose?.();
-            });
-            return;
-        }
-
-        const resource = `${url}/v1/messages?chunked=true`;
-
-        try {
-            const response = await fetch(resource, { signal: controller.signal });
-            if (!response.ok) {
-                throw new StreamError(`Failed to stream messages: ${response.status}`, response.status);
+        while (true) {
+            const { value, done } = await reader.read();
+            signal.throwIfAborted();
+            try {
+                buffer += decoder.decode(value, { stream: !done });
+            } catch {
+                throw new StreamProtocolError('Message stream contains invalid UTF-8');
             }
 
-            onOpen?.();
-
-            const reader = response.body?.getReader();
-            if (!reader) {
-                throw new Error('Stream reader not available');
-            }
-
-            const decoder = new TextDecoder();
-            let buffer = '';
-
-            const extractNextJson = (buf: string): { json: string; rest: string } | null => {
-                // Find first non-whitespace char
-                const startIdx = buf.search(/\S/);
-                if (startIdx === -1) return null;
-                const startChar = buf[startIdx];
-                if (startChar !== '{' && startChar !== '[') return null;
-
-                let depth = 0;
-                let inString = false;
-                let escape = false;
-                for (let i = startIdx; i < buf.length; i++) {
-                    const ch = buf[i];
-                    if (inString) {
-                        if (escape) {
-                            escape = false;
-                        } else if (ch === '\\') {
-                            escape = true;
-                        } else if (ch === '"') {
-                            inString = false;
-                        }
+            let start = 0;
+            while (offset < buffer.length) {
+                const ch = buffer[offset];
+                if (offset - start >= MAX_MESSAGE_LENGTH) {
+                    throw new StreamProtocolError('Message exceeds 1,048,576 characters');
+                }
+                if (depth === 0) {
+                    if (/\s/.test(ch)) {
+                        start = ++offset;
                         continue;
                     }
-
-                    if (ch === '"') {
-                        inString = true;
-                        continue;
-                    }
-
-                    if (ch === '{' || ch === '[') {
-                        depth++;
-                    } else if (ch === '}' || ch === ']') {
-                        depth--;
-                        if (depth === 0) {
-                            const json = buf.slice(startIdx, i + 1);
-                            const rest = buf.slice(i + 1);
-                            return { json, rest };
-                        }
+                    if (ch !== '{' && ch !== '[') {
+                        throw new StreamProtocolError('Expected a JSON message or message list');
                     }
                 }
 
-                return null;
-            };
-
-            // Helper to process an extracted JSON chunk
-            const processChunkBuffer = (
-                extracted: { json: string; rest: string } | null,
-                errorContext: string
-            ): { parsedData: Message | Message[] | undefined; rest: string } => {
-                let parsedData: Message | Message[] | undefined;
-
-                if (!extracted) {
-                    return { parsedData: undefined, rest: '' };
+                if (inString) {
+                    if (escaped) escaped = false;
+                    else if (ch === '\\') escaped = true;
+                    else if (ch === '"') inString = false;
+                } else if (ch === '"') {
+                    inString = true;
+                } else if (ch === '{' || ch === '[') {
+                    depth++;
+                } else if (ch === '}' || ch === ']') {
+                    depth--;
                 }
+                offset++;
 
-                try {
-                    const parsed = JSON.parse(extracted.json);
-                    const validation = validateMessage(parsed);
-                    if (validation.success && validation.data) {
-                        parsedData = validation.data;
-                    } else {
-                        console.error(`Invalid message format in ${errorContext}`, validation.error);
-                    }
-                } catch (err) {
-                    console.error(`Failed to parse ${errorContext}`, err);
-                }
-
-                // Call onChunk outside try/catch to handle callback errors separately
-                if (parsedData !== undefined) {
+                if (depth === 0) {
+                    let parsed: unknown;
                     try {
-                        onChunk(parsedData);
-                    } catch (err) {
-                        onError?.(err);
+                        parsed = JSON.parse(buffer.slice(start, offset));
+                    } catch {
+                        throw new StreamProtocolError('Message stream contains invalid JSON');
                     }
+                    const result = messageUpdateSchema.safeParse(parsed);
+                    if (!result.success) {
+                        throw new StreamProtocolError(`Invalid message payload: ${result.error.message}`);
+                    }
+                    yield result.data;
+                    signal.throwIfAborted();
+                    start = offset;
                 }
-
-                return { parsedData, rest: extracted.rest };
-            };
-
-            const pump = async () => {
-                try {
-                    while (true) {
-                        const { value, done } = await reader.read();
-                        if (done) {
-                            // Flush the TextDecoder to get any remaining bytes
-                            buffer += decoder.decode();
-
-                            // Drain the entire buffer using the same while-loop as streaming
-                            let extracted = extractNextJson(buffer);
-                            while (extracted) {
-                                const { rest } = processChunkBuffer(extracted, 'chunk');
-                                buffer = rest;
-                                extracted = extractNextJson(buffer);
-                            }
-                            onClose?.();
-                            break;
-                        }
-
-                        buffer += decoder.decode(value, { stream: true });
-
-                        let extracted = extractNextJson(buffer);
-                        while (extracted) {
-                            const { rest } = processChunkBuffer(extracted, 'stream');
-                            buffer = rest;
-                            extracted = extractNextJson(buffer);
-                        }
-                    }
-                } catch (err) {
-                    // Only call onError if this is not an abort error (user/code explicitly cancelled)
-                    if (!isAbortError(err)) {
-                        onError?.(err);
-                    }
+            }
+            buffer = buffer.slice(start);
+            offset -= start;
+            if (done) {
+                if (buffer.trim()) {
+                    throw new StreamProtocolError('Message stream ended with incomplete JSON');
                 }
-            };
-
-            // Start background pump (don't await)
-            void pump();
-        } catch (error) {
-            // Only call onError if this is not an abort error (user/code explicitly cancelled)
-            if (!isAbortError(error)) {
-                onError?.(error);
+                return;
             }
         }
-    })();
+    } finally {
+        try {
+            await reader.cancel();
+        } finally {
+            reader.releaseLock();
+        }
+    }
+}
 
-    return controller;
-};
-export const triggerMessage = async (url: string, id: string, payload: TriggerPayload): Promise<void> => {
-    const resource = `${url}/v1/message/${id}/trigger`;
+export function createTriggerPayload(message: Message, values: Record<string, string>): TriggerPayload {
+    return message.tokens.map(token => ({
+        ...token,
+        ...(token.text ? { text: { ...token.text, text: values[token.name] ?? '' } } : {}),
+    }));
+}
+
+async function requestMessage(resource: string, init: RequestInit, signal: AbortSignal): Promise<void> {
+    signal.throwIfAborted();
+    const controller = new AbortController();
+    const abort = () => controller.abort(signal.reason);
+    signal.addEventListener('abort', abort, { once: true });
+    const timeout = setTimeout(() => controller.abort(new DOMException('Request timed out', 'TimeoutError')), 15_000);
     try {
-        const response = await fetch(resource, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        const response = await fetch(resource, { ...init, signal: controller.signal });
+        controller.signal.throwIfAborted();
+        await response.body?.cancel();
         if (!response.ok) {
-            throw new StreamError(`Failed to trigger message: ${response.status}`, response.status);
+            throw new StreamError(`Message request failed: ${response.status}`, response.status);
         }
     } catch (error) {
-        if (error instanceof StreamError) {
-            throw error;
-        }
-        console.error('Error triggering message:', error);
-        throw new Error(`Failed to trigger message at ${resource} with payload: ${JSON.stringify(payload)}`);
+        controller.signal.throwIfAborted();
+        throw error;
+    } finally {
+        clearTimeout(timeout);
+        signal.removeEventListener('abort', abort);
     }
-};
+}
 
-export const clearMessage = async (url: string, id: string): Promise<void> => {
-    const resource = `${url}/v1/message/${id}/clear`;
-    try {
-        const response = await fetch(resource, { method: 'GET' });
-        if (!response.ok) {
-            throw new StreamError(`Failed to clear message: ${response.status}`, response.status);
-        }
-    } catch (error) {
-        if (error instanceof StreamError) {
-            throw error;
-        }
-        console.error('Error clearing message:', error);
-        throw new Error(`Failed to clear message at ${resource}`);
-    }
-};
+export function triggerMessage(url: string, id: string, payload: TriggerPayload, signal: AbortSignal): Promise<void> {
+    return requestMessage(`${normalizeConnectionUrl(url)}/v1/message/${encodeURIComponent(id)}/trigger`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    }, signal);
+}
+
+export function clearMessage(url: string, id: string, signal: AbortSignal): Promise<void> {
+    return requestMessage(`${normalizeConnectionUrl(url)}/v1/message/${encodeURIComponent(id)}/clear`, {}, signal);
+}

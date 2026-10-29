@@ -1,9 +1,16 @@
 {
   "app": {
+    "connect": "Подключить",
+    "disconnect": "Отключить",
+    "invalidUrl": "Введите адрес сервера HTTP или HTTPS без учётных данных, строки запроса или фрагмента.",
     "loading": "Загрузка...",
     "enterProPresenterUrl": "Введите подключение к ProPresenter"
   },
   "message-list": {
+    "connecting": "Подключение к ProPresenter...",
+    "connected": "Подключено к ProPresenter.",
+    "reconnecting": "Соединение потеряно. Повторное подключение... Отображаемые сообщения могут быть устаревшими.",
+    "empty": "Нет доступных сообщений.",
     "errors": {
       "failed-to-connect": "Не удалось подключиться к ProPresenter. Проверьте информацию о подключении.",
       "unknown-error": "Произошла непредвиденная ошибка: {{error}}.",
@@ -17,6 +24,7 @@
     }
   },
   "message-item": {
+    "managed-token": "Настроено в ProPresenter",
     "formatted-message": "<0>Форматированное сообщение:</0> <1>{{message}}</1>",
     "show": "Показать",
     "show-again": "Показать снова",

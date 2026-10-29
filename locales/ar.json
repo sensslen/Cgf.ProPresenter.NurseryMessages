@@ -1,9 +1,16 @@
 {
   "app": {
+    "connect": "اتصال",
+    "disconnect": "قطع الاتصال",
+    "invalidUrl": "أدخل عنوان خادم HTTP أو HTTPS بدون بيانات اعتماد أو استعلام أو جزء مرجعي.",
     "loading": "جاري التحميل...",
     "enterProPresenterUrl": "أدخل الاتصال بـ ProPresenter"
   },
   "message-list": {
+    "connecting": "جارٍ الاتصال بـ ProPresenter...",
+    "connected": "متصل بـ ProPresenter.",
+    "reconnecting": "انقطع الاتصال. جارٍ إعادة الاتصال... قد تكون الرسائل المعروضة قديمة.",
+    "empty": "لا توجد رسائل متاحة.",
     "errors": {
       "failed-to-connect": "فشل الاتصال بـ ProPresenter. يرجى التحقق من معلومات الاتصال.",
       "unknown-error": "حدث خطأ غير متوقع: {{error}}.",
@@ -17,6 +24,7 @@
     }
   },
   "message-item": {
+    "managed-token": "تم تكوينه في ProPresenter",
     "formatted-message": "<0>رسالة منسقة:</0> <1>{{message}}</1>",
     "show": "عرض",
     "show-again": "عرض مرة أخرى",

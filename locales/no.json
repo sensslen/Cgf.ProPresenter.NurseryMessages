@@ -1,9 +1,16 @@
 {
   "app": {
+    "connect": "Koble til",
+    "disconnect": "Koble fra",
+    "invalidUrl": "Skriv inn en HTTP- eller HTTPS-serveradresse uten påloggingsinformasjon, spørring eller fragment.",
     "loading": "Laster...",
     "enterProPresenterUrl": "Skriv inn tilkobling til ProPresenter"
   },
   "message-list": {
+    "connecting": "Kobler til ProPresenter...",
+    "connected": "Koblet til ProPresenter.",
+    "reconnecting": "Tilkoblingen ble brutt. Kobler til på nytt... Viste meldinger kan være utdaterte.",
+    "empty": "Ingen meldinger er tilgjengelige.",
     "errors": {
       "failed-to-connect": "Kunne ikke koble til ProPresenter. Vennligst sjekk tilkoblingsinformasjonen.",
       "unknown-error": "En uventet feil oppstod: {{error}}.",
@@ -17,6 +24,7 @@
     }
   },
   "message-item": {
+    "managed-token": "Konfigurert i ProPresenter",
     "formatted-message": "<0>Formatert melding:</0> <1>{{message}}</1>",
     "show": "Vis",
     "show-again": "Vis igjen",
