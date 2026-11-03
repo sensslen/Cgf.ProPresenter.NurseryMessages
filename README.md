@@ -8,18 +8,18 @@ The running app with sample messages from a mock ProPresenter API. The interface
 
 <img width="720" alt="Desktop interface with a grouped message sheet, on-screen indicator, and version footer" src="https://github.com/user-attachments/assets/5758c253-ee4b-48a4-9519-3a3eda57a928">
 
-| Phone, light | Phone, dark |
-| --- | --- |
+| Phone, light                                                                                                                             | Phone, dark                                                                                                                             |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | <img width="260" alt="Phone layout in light mode" src="https://github.com/user-attachments/assets/09a813be-bf10-4177-9ef6-ab00e63f7961"> | <img width="260" alt="Phone layout in dark mode" src="https://github.com/user-attachments/assets/78220739-39c3-4b64-86a2-5f77a93b9dc1"> |
 
 ## Features
 
-* **Connect to ProPresenter Remotely**: Enter the network address of your ProPresenter instance to connect to it.
-* **View Available Messages**: The application will list all available messages from your ProPresenter setup.
-* **Fill in Message Tokens**: If a message contains tokens (e.g., for a child's name or number), you can easily fill them in before displaying the message.
-* **Real-time Updates**: Messages update through ProPresenter's chunked stream. Lost connections reconnect automatically with backoff; the connection status warns when displayed messages may be stale.
-* **Localized Interface**: The user interface is available in multiple languages including English, German, Spanish, French, Portuguese, Korean, Norwegian, Czech, Simplified Chinese, Russian, Hindi, Arabic, and Bengali. The application automatically detects your browser's language.
-* **Responsive Design**: A single message sheet adapts to phones and tablets, follows the system light/dark setting, and supports right-to-left layouts. Connection status stays visible while scrolling. The version footer and action notifications have their own space, so they never cover message controls.
+- **Connect to ProPresenter Remotely**: Enter the network address of your ProPresenter instance to connect to it.
+- **View Available Messages**: The application will list all available messages from your ProPresenter setup.
+- **Fill in Message Tokens**: If a message contains tokens (e.g., for a child's name or number), you can easily fill them in before displaying the message.
+- **Real-time Updates**: Messages update through ProPresenter's chunked stream. Lost connections reconnect automatically with backoff; the connection status warns when displayed messages may be stale.
+- **Localized Interface**: The user interface is available in multiple languages including English, German, Spanish, French, Portuguese, Korean, Norwegian, Czech, Simplified Chinese, Russian, Hindi, Arabic, and Bengali. The application automatically detects your browser's language.
+- **Responsive Design**: A single message sheet adapts to phones and tablets, follows the system light/dark setting, and supports right-to-left layouts. Connection status stays visible while scrolling. The version footer and action notifications have their own space, so they never cover message controls.
 
 ## How to Use
 
@@ -46,7 +46,7 @@ This section is for developers who want to run the application locally or deploy
 
 ### Running in a Development Environment
 
-Use [Node.js](https://nodejs.org/) 24.15 or later in the Node 24 release line, or Node 26+, with npm. CI uses Node 26 from `.node-version`.
+Use [Node.js](https://nodejs.org/) 24.15 or later in the Node 24 release line, or Node 26+, with npm. CI uses Node 26.13.0 from `.node-version`.
 
 1.  **Clone the repository** to your local machine.
 2.  **Install the dependencies** by running the following command in the project's root directory:
@@ -61,7 +61,7 @@ Use [Node.js](https://nodejs.org/) 24.15 or later in the Node 24 release line, o
 
 ### Development checks and architecture
 
-Run `npm run lint`, `npm test`, and `npm run build` before submitting changes. Pull requests and releases run these checks automatically.
+Run `npm run format:check`, `npm run lint`, `npm test`, and `npm run build` before submitting changes. Pull requests and releases run these checks automatically. Use `npm run format` to apply Prettier formatting, or `npm run typecheck` to check types without bundling.
 
 The browser connects directly to ProPresenter; no application backend or global state store is required. The API module validates responses and yields messages from an abortable async stream. `useMessages` owns connection lifetime, reconnection, and server state. Message editors own text drafts and keep them across stream updates; switching connections resets them. Show/hide requests have a 15-second timeout and are cancelled when their connection is removed.
 
@@ -71,20 +71,24 @@ Token validation checks names and editable text. Timer, clock, and other ProPres
 
 Tests use mocked streams and requests, including fragmented UTF-8/JSON, cancellation, retries, message actions, and connection navigation. A live ProPresenter instance is still needed to verify server compatibility and browser network permissions.
 
-TypeScript stays on the latest 6.0 patch while `typescript-eslint` requires TypeScript below 6.1. Upgrade both together when its peer range supports TypeScript 7.
+TypeScript stays on the latest 6.0 patch while `typescript-eslint` requires TypeScript below 6.1. Upgrade when the compiler and analyzers can use the same version.
+
+Commit `package.json` and `package-lock.json` together after dependency updates. CI uses `npm ci`, which rejects a lockfile that does not match the manifest.
 
 ### Deploying to a Static Web Server
 
 To deploy this application, you first need to build the static assets.
 
 1.  **Build the application** by running the following command in the project's root directory:
+
     ```bash
     npm run build
     ```
+
     This command will create a `dist` directory containing the optimized static files for your application (HTML, CSS, and JavaScript).
 
 2.  **Host the `dist` directory** with any static web server. A simple option is the `static-web-server` tool.
-    * You can find instructions on how to set up `static-web-server` in their official documentation: [Static Web Server - Getting Started](https://static-web-server.net/getting-started/)
+    - You can find instructions on how to set up `static-web-server` in their official documentation: [Static Web Server - Getting Started](https://static-web-server.net/getting-started/)
 
 Once you have your web server set up, configure it to serve the files from the `dist` directory.
 

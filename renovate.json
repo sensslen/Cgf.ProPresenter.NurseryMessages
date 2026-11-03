@@ -1,7 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
-  "minimumReleaseAge": "48 hours"
+  "extends": ["config:recommended"],
+  "minimumReleaseAge": "48 hours",
+  "packageRules": [
+    {
+      "description": "Keep TypeScript compatible with typescript-eslint.",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<6.1.0"
+    }
+  ]
 }
