@@ -103,7 +103,9 @@ export default function App() {
         <div className="notification-dock">
           <div className="notification" data-kind={notification.kind}>
             <p role={notification.kind === 'error' ? 'alert' : 'status'}>
-              {t(notification.key, notification.values)}
+              {notification.values
+                ? t(notification.key, notification.values)
+                : t(notification.key)}
             </p>
             <button
               type="button"
