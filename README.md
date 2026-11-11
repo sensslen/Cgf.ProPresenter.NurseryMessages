@@ -94,7 +94,7 @@ Once you have your web server set up, configure it to serve the files from the `
 
 ### Presetting the ProPresenter address
 
-To make the app connect to a fixed ProPresenter instance when it opens, edit `config.json` next to `index.html` on the web server. The same file is in each release archive and in `public/config.json` in the repository. No rebuild is needed:
+To make the app connect to a fixed ProPresenter instance when it opens, edit `config.json` next to `index.html` on the web server. The same file is in each release archive and in `public/config.json` in the repository. It ships with an empty `defaultUrl`, which sets no default address. Set `defaultUrl` to an address; no rebuild is needed:
 
 ```json
 {
@@ -102,7 +102,7 @@ To make the app connect to a fixed ProPresenter instance when it opens, edit `co
 }
 ```
 
-When the page URL names no address, the app redirects to the page URL for `defaultUrl`, as if an operator had entered it. An address already in the page URL, such as a bookmarked link, is never replaced, and other parts of the page URL are kept. Operators can still change or clear the address in the app. After changing `defaultUrl`, open the app without a `url` parameter to pick up the new address; reloading a page whose URL already holds the old address keeps it. An empty `defaultUrl`, a missing, invalid or unreachable `config.json` (the app waits up to 5 seconds for it), or an invalid address starts the app without a connection; problems are logged to the browser console.
+When the page URL names no address, the app redirects to the page URL for `defaultUrl`, as if an operator had entered it. An address already in the page URL, such as a bookmarked link, is never replaced, and other parts of the page URL are kept. Operators can still change or clear the address in the app. After changing `defaultUrl`, open the app without a `url` parameter to pick up the new address; reloading a page whose URL already holds the old address keeps it. A missing or empty `defaultUrl`, a missing, invalid or unreachable `config.json` (the app waits up to 5 seconds for it), or an invalid address starts the app without a connection; problems are logged to the browser console.
 
 ## Releases
 

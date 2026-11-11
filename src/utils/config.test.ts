@@ -7,6 +7,7 @@ import {
   redirectToDefaultConnection,
 } from './config'
 import { encodeUrlToBase64 } from './urlEncoding'
+import shippedConfig from '../../public/config.json?raw'
 
 beforeEach(() => {
   window.history.replaceState(null, '', '/')
@@ -19,6 +20,11 @@ afterEach(() => {
 })
 
 describe('parseDefaultConnectionUrl', () => {
+  it('finds no address in the config.json that ships with the app', () => {
+    expect(JSON.parse(shippedConfig)).toEqual({ defaultUrl: '' })
+    expect(parseDefaultConnectionUrl(JSON.parse(shippedConfig))).toBe('')
+  })
+
   it('normalizes a valid address', () => {
     expect(
       parseDefaultConnectionUrl({ defaultUrl: ' http://192.168.1.20:1025/ ' }),
