@@ -21,15 +21,28 @@ export function parseDefaultConnectionUrl(config: unknown): string {
   }
 }
 
+// The page waits for this load before rendering, so a stalled request must not block it.
+export const CONFIG_TIMEOUT_MS = 5_000
+
 // The config file is optional; a missing or unreadable file means no default address.
 export async function loadDefaultConnectionUrl(): Promise<string> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), CONFIG_TIMEOUT_MS)
   try {
-    const response = await fetch(CONFIG_PATH, { cache: 'no-store' })
-    if (!response.ok) return ''
+    const response = await fetch(CONFIG_PATH, {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+    if (!response.ok) {
+      console.error(`Ignoring config.json: HTTP ${response.status}`)
+      return ''
+    }
     return parseDefaultConnectionUrl(await response.json())
   } catch (error) {
     console.error('Ignoring unreadable config.json:', error)
     return ''
+  } finally {
+    clearTimeout(timer)
   }
 }
 

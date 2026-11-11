@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  CONFIG_TIMEOUT_MS,
   loadDefaultConnectionUrl,
   parseDefaultConnectionUrl,
   redirectToDefaultConnection,
@@ -48,7 +49,68 @@ describe('loadDefaultConnectionUrl', () => {
     await expect(loadDefaultConnectionUrl()).resolves.toBe(
       'http://192.168.1.20:1025',
     )
-    expect(fetch).toHaveBeenCalledWith('./config.json', { cache: 'no-store' })
+    expect(fetch).toHaveBeenCalledWith('./config.json', {
+      cache: 'no-store',
+      signal: expect.any(AbortSignal),
+    })
+  })
+
+  it('logs the status of an error response', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response(null, { status: 404 })),
+    )
+    await loadDefaultConnectionUrl()
+    expect(console.error).toHaveBeenCalledWith('Ignoring config.json: HTTP 404')
+  })
+
+  it('gives up on a stalled request after the timeout', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(
+          (_: string, { signal }: RequestInit) =>
+            new Promise((_, reject) =>
+              signal?.addEventListener('abort', () => reject(signal.reason)),
+            ),
+        ),
+      )
+      const load = loadDefaultConnectionUrl()
+      await vi.advanceTimersByTimeAsync(CONFIG_TIMEOUT_MS - 1)
+      let settled = false
+      void load.then(() => (settled = true))
+      await Promise.resolve()
+      expect(settled).toBe(false)
+      await vi.advanceTimersByTimeAsync(1)
+      await expect(load).resolves.toBe('')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('gives up on a stalled response body after the timeout', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async (_: string, { signal }: RequestInit) => {
+          const body = new ReadableStream({
+            start(stream) {
+              signal?.addEventListener('abort', () =>
+                stream.error(signal.reason),
+              )
+            },
+          })
+          return new Response(body)
+        }),
+      )
+      const load = loadDefaultConnectionUrl()
+      await vi.advanceTimersByTimeAsync(CONFIG_TIMEOUT_MS)
+      await expect(load).resolves.toBe('')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it.each([
